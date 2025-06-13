@@ -1,0 +1,16 @@
+---
+description: Use this rule any time you touch toast logic, notification UX, or the Sonner setup 
+globs: 
+alwaysApply: false
+---
+# Toast Usage Guidelines
+
+Use [Sonner](mdc:https:/github.com/sonner-toast/sonner) for all in-app notifications. Follow these rules to ensure a consistent and snappy UX:
+
+- **Import**: Always import the `toast` API from `"sonner"`.
+- **Optimistic**: Show success toasts **immediately** on user actions (form submits, toggles) before awaiting server responses.
+- **Error Handling**: If the network request fails, revert UI state and show an error toast.
+- **Position**: Configure the global `<Toaster />` with `position="top-center"` to avoid covering important UI elements.
+- **Layout Layer**: The `<Toaster />` component must be placed at the layout or provider layer (e.g., in `app/providers.tsx`), **never** inside individual pages or components.
+- **Duration & Dismiss**: Use a consistent `duration` (e.g., `2000ms`) and enable `closeButton` to make toasts dismissible.
+- **No Duplicates**: Avoid firing the same success toast twice (once optimistically and again on response).

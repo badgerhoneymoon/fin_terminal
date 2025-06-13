@@ -1,0 +1,100 @@
+---
+description: Guidelines for creating, running, and maintaining unit tests using Vitest. Covers test file placement, naming, configuration, and best practices.
+globs: 
+alwaysApply: false
+---
+# Unit Testing Guidelines
+
+---
+description: Guidelines for creating, running, and maintaining unit tests using Vitest. Covers test file placement, naming, configuration, and best practices.
+globs: tests/**/*.test.ts
+alwaysApply: false
+---
+
+How to create and run unit tests for this project using Vitest.
+
+## Creating Unit Tests
+
+1. Place all test files in the `tests/` directory.
+2. Name your test files with the `.test.ts` suffix (e.g., `calculateReminderTime.test.ts`).
+3. Use [Vitest](mdc:https:/vitest.dev) for writing tests. Import from `vitest` for describe/it/expect, etc.
+4. Import the functions/modules to be tested using absolute or relative imports.
+5. Write clear, isolated test cases. Use `describe` blocks for grouping and `it` for individual cases.
+6. Use mocks and stubs as needed (see `vi` from Vitest for mocking).
+
+Example (see [`tests/calculateReminderTime.test.ts`](mdc:tests/calculateReminderTime.test.ts)):
+```typescript
+import { describe, it, expect, vi } from 'vitest';
+import { calculateReminderTime } from '@/lib/utils/date-utils';
+
+describe('calculateReminderTime', () => {
+  it('should compute reminder time correctly', () => {
+    // ...test logic...
+  });
+});
+```
+
+## Running Unit Tests
+
+- To run all tests:
+  ```bash
+  npm test
+  # or
+  npx vitest
+  ```
+- To run tests in watch mode:
+  ```bash
+  npx vitest --watch
+  ```
+- To run a specific test file:
+  ```bash
+  npx vitest tests/calculateReminderTime.test.ts
+  ```
+
+## Configuration
+- Test runner: [Vitest](mdc:https:/vitest.dev)
+- Test scripts are defined in [`package.json`](mdc:package.json) under `scripts` (see the `test` script).
+- No need to start the dev server for running tests.
+
+## package.json Setup
+
+1. Install Vitest as a dev dependency:
+   ```bash
+   npm install --save-dev vitest
+   ```
+2. Add scripts to your `package.json`:
+   ```json
+   "scripts": {
+     "test": "vitest",
+     "test:watch": "vitest --watch"
+   }
+   ```
+3. (Optional) Generate a Vitest config file for custom setup:
+   ```bash
+   npx vitest config
+   ```
+   This creates `vitest.config.ts` or `vitest.config.js` for advanced options (not required for basic usage).
+
+Vitest will automatically find all files matching `*.test.ts` in your `tests/` directory.
+
+## Best Practices
+- Keep tests concise and focused.
+- Mock time and dependencies where needed for deterministic results.
+- Ensure tests are reliable and repeatable.
+- Add new tests for every new feature or bug fix.
+
+## Additional Insights
+- Treat unit tests as living documentation: tests should reflect the specification and user requirements, not just verify code paths.
+- Use clear, descriptive test names that state the scenario and expected outcome.
+- Structure tests as data-driven when possible: use parameterized tests or tables to cover edge cases systematically.
+- Include explicit logs or comments in tests to surface key input-output mappings, especially for complex domain logic (e.g., notification channels).
+- Focus on observable behavior and business rules; avoid testing internal implementation details.
+- Critically review AI-generated tests to ensure they capture real requirements, not just code structure.
+- Each assertion should document what it's validating; use readable messages or labeled results.
+- Handle edge cases first: nulls, empty arrays, off-by-one errors, and missing configurations.
+- Use before/after hooks for shared setup, but keep each test isolated and deterministic.
+- Run tests in verbose mode (`npx vitest --verbose`) in CI to catch hidden failures and improve log clarity.
+
+---
+
+For more details, see [`tests/calculateReminderTime.test.ts`](mdc:tests/calculateReminderTime.test.ts) and [`package.json`](mdc:package.json).
