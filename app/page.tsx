@@ -1,8 +1,10 @@
-
+import { BudgetProvider } from '@/lib/budget-context';
+import { BudgetDrop } from '@/components/BudgetDrop';
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
-    </div>
+    <BudgetProvider>
+      <BudgetDrop />
+    </BudgetProvider>
   );
 }

@@ -6,30 +6,34 @@ alwaysApply: false
 # Unit Testing Guidelines
 
 ---
-description: Guidelines for creating, running, and maintaining unit tests using Vitest. Covers test file placement, naming, configuration, and best practices.
+description: Project-agnostic guidelines for creating, running, and maintaining unit tests using Vitest. Covers test file placement, naming, configuration, and best practices.
 globs: tests/**/*.test.ts
 alwaysApply: false
 ---
 
-How to create and run unit tests for this project using Vitest.
+How to create and run unit tests using Vitest in any project. **These guidelines are especially critical when using AI to generate tests, in order to prevent biased or low-value tests.**
 
 ## Creating Unit Tests
 
-1. Place all test files in the `tests/` directory.
-2. Name your test files with the `.test.ts` suffix (e.g., `calculateReminderTime.test.ts`).
-3. Use [Vitest](mdc:https:/vitest.dev) for writing tests. Import from `vitest` for describe/it/expect, etc.
-4. Import the functions/modules to be tested using absolute or relative imports.
+1. Place all test files in a `tests/` directory at your project root.
+2. Name your test files with the `.test.ts` suffix (e.g., `calculateDueTime.test.ts`).
+3. Use @Vitest for writing tests. Import from `vitest` for describe/it/expect, etc.
+4. Import the functions/modules to be tested using your project's import structure.
 5. Write clear, isolated test cases. Use `describe` blocks for grouping and `it` for individual cases.
 6. Use mocks and stubs as needed (see `vi` from Vitest for mocking).
 
-Example (see [`tests/calculateReminderTime.test.ts`](mdc:tests/calculateReminderTime.test.ts)):
+Example:
 ```typescript
 import { describe, it, expect, vi } from 'vitest';
-import { calculateReminderTime } from '@/lib/utils/date-utils';
+import { yourFunctionToTest } from '../src/utils/your-module';
 
-describe('calculateReminderTime', () => {
-  it('should compute reminder time correctly', () => {
-    // ...test logic...
+describe('yourFunctionToTest', () => {
+  it('should handle expected input correctly', () => {
+    expect(yourFunctionToTest('valid-input')).toBe('expected-output');
+  });
+  
+  it('should throw on invalid input', () => {
+    expect(() => yourFunctionToTest(null)).toThrow();
   });
 });
 ```
@@ -48,12 +52,12 @@ describe('calculateReminderTime', () => {
   ```
 - To run a specific test file:
   ```bash
-  npx vitest tests/calculateReminderTime.test.ts
+  npx vitest tests/your-test-file.test.ts
   ```
 
 ## Configuration
-- Test runner: [Vitest](mdc:https:/vitest.dev)
-- Test scripts are defined in [`package.json`](mdc:package.json) under `scripts` (see the `test` script).
+- Test runner: @Vitest
+- Test scripts are defined in `package.json` under `scripts` (see the `test` script).
 - No need to start the dev server for running tests.
 
 ## package.json Setup
@@ -77,24 +81,428 @@ describe('calculateReminderTime', () => {
 
 Vitest will automatically find all files matching `*.test.ts` in your `tests/` directory.
 
-## Best Practices
-- Keep tests concise and focused.
-- Mock time and dependencies where needed for deterministic results.
-- Ensure tests are reliable and repeatable.
-- Add new tests for every new feature or bug fix.
+## Multi-Layered Testing Strategy
 
-## Additional Insights
-- Treat unit tests as living documentation: tests should reflect the specification and user requirements, not just verify code paths.
-- Use clear, descriptive test names that state the scenario and expected outcome.
-- Structure tests as data-driven when possible: use parameterized tests or tables to cover edge cases systematically.
-- Include explicit logs or comments in tests to surface key input-output mappings, especially for complex domain logic (e.g., notification channels).
-- Focus on observable behavior and business rules; avoid testing internal implementation details.
-- Critically review AI-generated tests to ensure they capture real requirements, not just code structure.
-- Each assertion should document what it's validating; use readable messages or labeled results.
-- Handle edge cases first: nulls, empty arrays, off-by-one errors, and missing configurations.
-- Use before/after hooks for shared setup, but keep each test isolated and deterministic.
-- Run tests in verbose mode (`npx vitest --verbose`) in CI to catch hidden failures and improve log clarity.
+### Layer 1: Pure Unit Tests (Primary)
+- Test individual functions in isolation
+- Mock all external dependencies
+- Test both success and failure paths
+- Fast, reliable, deterministic
+
+### Layer 2: Bug Detection/Regression Tests
+- Test real production scenarios that break
+- Focus on browser edge cases, timing issues, quota limits
+- Prove bugs exist or don't exist
+- Example: localStorage crashes in incognito mode
+
+### Layer 3: Integration Tests
+- Test components with real providers/context
+- Test user workflows end-to-end
+- Slower but catch integration issues
+
+## Test File Organization
+
+```
+tests/
+├── unit/                    # Pure unit tests
+├── integration/             # Component + context tests
+├── bugs/                    # Bug detection tests
+└── edge-cases/              # Browser/environment-specific tests
+```
+
+## Critical Anti-Patterns to Avoid
+
+### ❌ Self-Fulfilling Prophecy Tests
+```typescript
+// BAD: Testing your own made-up logic
+function myInterpretationOfLogic() {
+  // My version of what I think the code should do
+}
+
+it('should work correctly', () => {
+  expect(myInterpretationOfLogic()).toBe(true) // Circular!
+})
+```
+
+### ✅ Test Actual Production Code
+```typescript
+// GOOD: Test the real imported function
+import { actualProductionFunction } from '../src/your-module'
+
+it('should handle real edge case', () => {
+  expect(() => actualProductionFunction(edgeCaseInput)).not.toThrow()
+})
+```
+
+### ❌ Justifying Your Code
+```typescript
+// BAD: Writing tests to make your code look good
+it('should be perfect because I wrote it', () => {
+  expect(myPerfectCode()).toBe('perfect') // Useless
+})
+```
+
+### ✅ Finding Real Problems
+```typescript
+// GOOD: Expose actual production bugs
+it('should crash in incognito mode (REAL BUG)', () => {
+  mockIncognitoMode()
+  expect(() => localStorage.setItem('key', 'value')).toThrow()
+})
+```
+
+## AI-Specific Guidelines for Writing Unbiased Tests
+
+To counteract the natural bias of validating one's own work, it is crucial for an AI to adopt an adversarial mindset when generating tests. Your primary goal is not to prove the code works, but to find where it *fails*.
+
+### Core Principle: Test Requirements, Not Implementation
+
+- **DO NOT** derive tests from the code you just wrote. This leads to tests that only confirm the existing logic, including its flaws.
+- **DO** base your tests on the original user request, bug report, or feature description. The tests should validate that the requirements are met, regardless of how the code was implemented.
+
+### Act as an Adversarial Tester
+
+Imagine you are a QA engineer whose sole purpose is to break the code.
+- **Think about edge cases**: What happens with `null`, `undefined`, empty strings, empty arrays, zero, negative numbers?
+- **Think about environment failures**: What if the network fails? What if `localStorage` is unavailable (e.g., incognito mode)? What if an API returns an unexpected payload?
+- **Think about user misbehavior**: How could a user misuse this feature to cause an error?
+
+### AI-Specific Anti-Pattern: The Confirmation Bias Test
+
+This is the most common pitfall for an AI. After writing a function, the AI writes a test that simply mirrors the function's logic.
+
+#### ❌ BAD: The AI confirms its own logic
+```typescript
+// AI-generated function
+function processData(data) {
+  if (!data || !data.items) {
+    return { count: 0, items: [] };
+  }
+  return { count: data.items.length, items: data.items };
+}
+
+// AI-generated test that confirms the implementation
+it('should return a count of 0 for null data', () => {
+  // This test is based on reading the `processData` implementation.
+  // It confirms one path but doesn't question if that's the *correct* behavior.
+  expect(processData(null)).toEqual({ count: 0, items: [] });
+});
+```
+The test above just re-states what the code does. It doesn't validate if this is the *correct* behavior according to the requirements. What if the requirement was to throw an error for `null` input?
+
+#### ✅ GOOD: Testing a requirement
+```typescript
+// Requirement: The system must gracefully handle missing data by throwing a specific error.
+
+// AI-generated test based on the requirement
+it('should throw InvalidInputError when data is null', () => {
+  // This test is derived from the requirement, not the implementation.
+  // It forces the implementation to be correct.
+  expect(() => processData(null)).toThrow(InvalidInputError);
+});
+```
+
+### Checklist for AI-Generated Tests:
+Before committing to a test suite, ask yourself:
+1.  **Source of Truth**: Is this test based on the project requirements or on the code I just wrote?
+2.  **Adversarial Nature**: Does this test try to *break* the code with edge cases and failure scenarios?
+3.  **Independence**: If someone else rewrote the function from scratch based on the requirements, would my test still be valid?
+4.  **Value**: Does this test catch a potential bug that would affect a real user? Or does it just increase code coverage?
+
+### Requirement Extraction Before Testing
+
+Before writing any tests, explicitly document what the code should do:
+
+#### ❌ BAD: Assuming requirements from code
+```typescript
+// Looking at existing code and writing tests to match
+function validateEmail(email) {
+  return email.includes('@');
+}
+
+it('should return true for emails with @', () => {
+  expect(validateEmail('test@example.com')).toBe(true);
+});
+```
+
+#### ✅ GOOD: Extract actual requirements first
+```typescript
+// REQUIREMENTS (from user story, bug report, or spec):
+// - Must reject emails without @ symbol
+// - Must reject emails with multiple @ symbols  
+// - Must reject empty strings
+// - Must handle null/undefined gracefully
+// - Must validate basic email format per RFC standards
+
+// NOW write tests based on requirements:
+it('should reject email without @ symbol', () => {
+  expect(validateEmail('invalid-email')).toBe(false);
+});
+
+it('should reject email with multiple @ symbols', () => {
+  expect(validateEmail('test@@example.com')).toBe(false);
+});
+```
+
+### Test-First Development for AI
+
+When possible, write tests BEFORE implementing code:
+1. **Extract requirements** from user request/bug report
+2. **Write failing tests** that validate those requirements  
+3. **Implement code** to make tests pass
+4. **Refactor** while keeping tests green
+
+This prevents confirmation bias because tests are written independently of implementation.
+
+### When to Ask Humans for Clarification
+
+AI should request clarification rather than making assumptions when:
+- **Ambiguous error handling**: Should invalid input throw an error or return a default value?
+- **Edge case behavior**: What happens with extremely large inputs, empty arrays, or null values?
+- **User experience decisions**: Should the UI show a spinner, error message, or redirect on failure?
+- **Business logic**: What constitutes "valid" data in this specific domain?
+- **Performance expectations**: Are there specific speed or memory requirements?
+
+Example clarification request:
+```
+"I need clarification on error handling for the validatePayment function:
+- Should it throw an exception for invalid payment methods?
+- Should it return { success: false, error: 'message' }?
+- Should it log errors silently and return false?
+
+The behavior affects how I write the tests."
+```
+
+### Focus on Real User Journeys
+
+Instead of testing isolated functions, test complete user workflows:
+
+#### ❌ BAD: Testing isolated function
+```typescript
+it('should calculate shipping cost', () => {
+  expect(calculateShipping(item, address)).toBe(9.99);
+});
+```
+
+#### ✅ GOOD: Testing user journey
+```typescript
+it('should complete checkout flow when user has valid payment', async () => {
+  // Test the actual sequence a user goes through
+  await addItemToCart(item);
+  await enterShippingAddress(validAddress);
+  await selectPaymentMethod(validCard);
+  
+  const result = await completeCheckout();
+  
+  expect(result.success).toBe(true);
+  expect(result.orderId).toBeTruthy();
+  expect(mockEmailService.sendConfirmation).toHaveBeenCalled();
+});
+```
+
+### Testing External Dependencies and Integration Points
+
+Pay special attention to boundaries where your code interacts with external systems:
+
+```typescript
+// Test API failures, network issues, quota limits
+it('should handle payment processor timeout', async () => {
+  mockPaymentAPI.timeout();
+  
+  await expect(processPayment(validCard))
+    .rejects.toThrow('Payment service unavailable');
+});
+
+// Test browser API limitations
+it('should handle localStorage quota exceeded', () => {
+  mockLocalStorage.throwQuotaExceededError();
+  
+  expect(() => saveUserPreferences(largeData))
+    .not.toThrow(); // Should gracefully degrade
+});
+
+// Test third-party service changes
+it('should handle unexpected API response format', async () => {
+  mockAPI.returnMalformedResponse();
+  
+  const result = await fetchUserData(userId);
+  expect(result.error).toContain('Invalid response format');
+});
+```
+
+## Best Practices
+
+### Test What Actually Exists
+- **Always import and test real production code**
+- Never create helper functions that "mirror" the real logic
+- If you can't import it, the code probably needs refactoring
+
+### Focus on Real Failure Scenarios
+- Test browser compatibility issues (iOS Safari, Chrome incognito)
+- Test network failures, timeouts, quota exceeded errors
+- Test race conditions and async timing issues
+- Test malformed data and unexpected inputs
+
+### Write Defensive Tests
+- Assume users will break your app in creative ways
+- Test the scenarios where things go wrong
+- Verify error handling actually works
+
+### Document What You're Proving
+```typescript
+it('should expose localStorage crash in incognito mode', () => {
+  // This tests a REAL production bug that affects real users
+  // When users interact with localStorage in incognito mode,
+  // the app crashes because localStorage.setItem throws QuotaExceededError
+})
+```
+
+## Testing Strategies by Code Type
+
+### Pure Functions
+```typescript
+// Test inputs → outputs, edge cases, error conditions
+import { calculateSomething } from '../src/utils/calculations'
+
+it('should handle invalid input gracefully', () => {
+  expect(() => calculateSomething('invalid')).toThrow('Invalid input')
+})
+```
+
+### React Components
+```typescript
+// Test user interactions, state changes, error boundaries
+import { render, fireEvent } from '@testing-library/react'
+import { YourComponent } from '../src/components/YourComponent'
+
+it('should handle user interaction', async () => {
+  render(<YourComponent />)
+  // Test actual component behavior
+})
+```
+
+### API Functions
+```typescript
+// Test network failures, invalid responses, auth errors
+import { apiCall } from '../src/api/your-api'
+
+it('should handle network failure', async () => {
+  mockNetworkFailure()
+  await expect(apiCall()).rejects.toThrow('Network error')
+})
+```
+
+### Classes/Objects
+```typescript
+// Test public methods, state management, edge cases
+import { YourClass } from '../src/classes/YourClass'
+
+it('should maintain valid state after operations', () => {
+  const instance = new YourClass()
+  instance.performOperation()
+  expect(instance.isValid()).toBe(true)
+})
+```
+
+## When Tests Should Fail
+
+- **Unit test fails** = Your code has a bug, fix the code
+- **Bug detection test fails** = You fixed a bug (good!) or test is wrong
+- **Integration test fails** = Components don't work together correctly
+
+## Red Flags in Test Reviews
+
+1. **Helper functions that recreate production logic** - Why not test the real thing?
+2. **Tests that can't fail** - What are they actually validating?
+3. **Mocking everything** - Are you testing anything real?
+4. **No edge cases** - How do you know it works when things go wrong?
+5. **All tests pass immediately** - Did you find any real issues?
+6. **Tests only test happy paths** - What about error conditions?
+7. **Overly complex test setup** - Suggests the code under test is too complex
+8. **AI-specific red flags:**
+   - **Tests mirror code structure exactly** - Suggests tests were derived from implementation
+   - **No requirement comments** - How do you know what behavior is correct?
+   - **All assertions use `.toBe()` with literal values** - Suggests copying from implementation
+   - **Test names match function names** - e.g., `calculateTotal()` tested by `should calculate total`
+   - **No "should fail when..." tests** - Missing adversarial thinking
+   - **Tests don't validate error messages** - Users see these messages!
+
+### Testing User-Facing Outputs
+
+Don't just test that errors are thrown - test that error messages are helpful:
+
+#### ❌ BAD: Testing error exists
+```typescript
+it('should throw error for invalid input', () => {
+  expect(() => processPayment(invalidCard)).toThrow();
+});
+```
+
+#### ✅ GOOD: Testing error message quality
+```typescript
+it('should show helpful error for expired card', () => {
+  const expiredCard = { number: '4111111111111111', expiry: '01/20' };
+  
+  expect(() => processPayment(expiredCard))
+    .toThrow('Card expired. Please use a different payment method.');
+});
+
+it('should show helpful error for invalid card format', () => {
+  const invalidCard = { number: '123', expiry: '12/25' };
+  
+  expect(() => processPayment(invalidCard))
+    .toThrow('Invalid card number. Please check and try again.');
+});
+```
+
+## Environment-Specific Testing
+
+### Browser APIs
+```typescript
+// Test browser compatibility and edge cases
+it('should handle missing API gracefully', () => {
+  global.someAPI = undefined
+  expect(() => yourFunction()).not.toThrow()
+})
+```
+
+### Node.js Specific
+```typescript
+// Test file system, process, environment variables
+it('should handle missing environment variable', () => {
+  delete process.env.REQUIRED_VAR
+  expect(() => yourFunction()).toThrow('Missing required configuration')
+})
+```
+
+### Framework Specific
+```typescript
+// Test framework-specific behaviors and edge cases
+// Adapt based on your framework (React, Vue, Angular, etc.)
+```
+
+## Universal Best Practices
+
+- Treat unit tests as living documentation: tests should reflect requirements, not just verify code paths
+- Use clear, descriptive test names that state the scenario and expected outcome
+- Structure tests as data-driven when possible: use parameterized tests or tables to cover edge cases systematically
+- Include explicit comments in tests to surface key input-output mappings
+- Focus on observable behavior and business rules; avoid testing internal implementation details
+- **Critically review AI-generated tests to ensure they capture real requirements, not just code structure**
+- Each assertion should document what it's validating; use readable error messages
+- Handle edge cases first: nulls, empty arrays, off-by-one errors, and missing configurations
+- Use before/after hooks for shared setup, but keep each test isolated and deterministic
+- Run tests in verbose mode (`npx vitest --verbose`) in CI to catch hidden failures and improve log clarity
+- **Question every test: "Would this catch a real bug that affects real users?"**
+
+## Common Gotchas
+
+- **Don't test library code** - Test your code that uses libraries
+- **Don't test implementation details** - Test public interfaces and behaviors
+- **Don't write tests just for coverage** - Write tests to catch real problems
+- **Don't ignore flaky tests** - Fix them or remove them
+- **Don't skip error cases** - They're often where real bugs hide
 
 ---
 
-For more details, see [`tests/calculateReminderTime.test.ts`](mdc:tests/calculateReminderTime.test.ts) and [`package.json`](mdc:package.json).
+These guidelines are framework and project agnostic. Adapt the import paths, file structure, and specific examples to match your project's architecture. 

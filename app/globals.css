@@ -1,9 +1,308 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-terminal: #000000;
+  --text-primary: #00FF90;
+  --text-accent: #FF00C8;
+  --text-secondary: #FFFFFF;
+  --glass-overlay: rgba(255, 255, 255, 0.1);
+  --border-highlight: #00FFFF;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
+  background-color: var(--bg-terminal);
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* CRT Scan Lines Effect */
+.crt-scanlines::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    transparent 0%,
+    rgba(0, 255, 144, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 100% 3px;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.2;
+  mix-blend-mode: multiply;
+}
+
+/* CRT Flicker Animation */
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+.crt-flicker {
+  animation: crt-flicker 40ms ease-in-out infinite;
+}
+
+/* Terminal Caret Blink */
+@keyframes caret-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.caret-blink {
+  animation: caret-blink 1s infinite;
+}
+
+/* Terminal Text Glow */
+@keyframes terminal-glow {
+  0%, 100% { 
+    text-shadow: 0 0 6px #00ff90, 0 0 12px #00ff90; 
+  }
+  50% { 
+    text-shadow: 0 0 8px #00ff90, 0 0 16px #00ff90, 0 0 24px #00ff90; 
+  }
+}
+
+.terminal-glow {
+  animation: terminal-glow 4s ease-in-out infinite;
+}
+
+/* Scanline Effect */
+@keyframes scanline {
+  0% { 
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10%, 90% { 
+    opacity: 0.1;
+  }
+  50% { 
+    opacity: 0.2;
+  }
+  100% { 
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+.scanline {
+  animation: scanline 8s linear infinite;
+}
+
+/* FX Status Pulse */
+@keyframes fx-pulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.3;
+    transform: scale(1.2);
+  }
+}
+
+.fx-pulse {
+  animation: fx-pulse 1s ease-in-out infinite;
+}
+
+/* Live Badge Update Animation */
+@keyframes badge-update {
+  0% { 
+    transform: scale(1);
+  }
+  50% { 
+    transform: scale(1.05);
+    color: var(--border-highlight);
+  }
+  100% { 
+    transform: scale(1);
+  }
+}
+
+.badge-update {
+  animation: badge-update 0.3s ease-out;
+}
+
+/* Glass Morphism Effect */
+.glass-panel {
+  background: var(--glass-overlay);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Progress Bar Animations */
+.progress-animate {
+  transition: width 400ms ease-out, height 400ms ease-out;
+}
+
+/* Chip Drop Animation */
+@keyframes chip-drop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.chip-drop {
+  animation: chip-drop 250ms ease-out;
+}
+
+/* Bucket Shake Animation */
+@keyframes bucket-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+.bucket-shake {
+  animation: bucket-shake 200ms ease-out;
+}
+
+/* Milestone Flash */
+@keyframes milestone-flash {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(255, 0, 200, 0.2); }
+}
+
+.milestone-flash {
+  animation: milestone-flash 600ms ease-out;
+}
+
+/* Drag and Drop Styles */
+.draggable {
+  cursor: grab;
+  user-select: none;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+.dragging {
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.drop-zone {
+  transition: border-color 200ms ease-out;
+}
+
+.drop-zone.drag-over {
+  border-color: var(--border-highlight);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+/* Typography */
+h1, h2, h3 {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+/* Button Styles */
+.btn-primary {
+  background: var(--text-primary);
+  color: var(--bg-terminal);
+  border: none;
+  padding: 8px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 200ms ease-out;
+}
+
+.btn-primary:hover {
+  background: rgba(0, 255, 144, 0.8);
+  box-shadow: 0 0 10px rgba(0, 255, 144, 0.5);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
+  padding: 8px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 200ms ease-out;
+}
+
+.btn-secondary:hover {
+  background: var(--text-primary);
+  color: var(--bg-terminal);
+}
+
+/* Input Styles */
+.input-terminal {
+  background: rgba(0, 255, 144, 0.1);
+  border: 1px solid var(--text-primary);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px;
+  outline: none;
+}
+
+.input-terminal:focus {
+  border-color: var(--text-accent);
+  box-shadow: 0 0 10px rgba(255, 0, 200, 0.3);
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --bg-terminal: #FAFAFA;
+  --text-primary: #333333;
+  --text-accent: #CC0099;
+  --text-secondary: #000000;
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus styles for keyboard navigation - no visible outline */
+.focusable:focus {
+  outline: none;
+}
+
+/* Hover border accent for consistency with circular view */
+.focusable:hover {
+  border-color: var(--text-accent) !important;
 }
 
 @layer utilities {
