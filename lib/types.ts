@@ -54,7 +54,7 @@ export type BudgetAction =
   | { type: 'REMOVE_CHIP'; payload: { chipId: string } }
   | { type: 'CLEAR_CHIPS' }
   | { type: 'RESET_BUCKET'; payload: { bucketId: string } }
-  | { type: 'UNDO_TRANSACTION'; payload: { transactionId: string } }
+
   | { type: 'DELETE_TRANSACTION'; payload: { transactionId: string } }
   | { type: 'UPDATE_TRANSACTION'; payload: { transactionId: string; newAmount: number } }
   | { type: 'CONVERT_CHIP_POLARITY'; payload: { chipId: string; isNegative: boolean } }
