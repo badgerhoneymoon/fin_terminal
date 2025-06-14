@@ -57,9 +57,31 @@ export function TransactionItem({
     };
   };
 
+  const getCleanNumberForEdit = (amount: number, currency: string): string => {
+    // Smart rounding without formatting (no commas, suitable for input)
+    if (currency === 'BTC') {
+      if (amount >= 1) return amount.toFixed(4);
+      else if (amount >= 0.01) return amount.toFixed(4);
+      else if (amount >= 0.001) return amount.toFixed(5);
+      else return amount.toFixed(6);
+    }
+    
+    if (amount >= 100) {
+      return Math.round(amount).toString();
+    } else if (amount >= 10) {
+      return (Math.round(amount * 10) / 10).toString();
+    } else if (amount >= 1) {
+      return amount.toFixed(2);
+    } else {
+      return amount < 0.01 && amount > 0
+        ? amount.toFixed(6).replace(/\.?0+$/, '')
+        : amount.toFixed(2);
+    }
+  };
+
   const handleEditTransaction = (transaction: Transaction) => {
     setEditingTransaction(transaction.id);
-    setEditValue(transaction.amount.toString());
+    setEditValue(getCleanNumberForEdit(transaction.amount, bucket.currency));
   };
 
   const handleSaveEdit = () => {

@@ -1,4 +1,5 @@
-import { BudgetState, Bucket, Transaction } from './types';
+import { BudgetState, Bucket, Transaction } from '../types';
+import { CURRENCY_THRESHOLDS } from '../constants';
 
 export function handleUpdateTransaction(
   state: BudgetState,
@@ -42,8 +43,9 @@ export function handleUpdateTransaction(
       if (newHoldings[transaction.originalChipCurrency]) {
         newHoldings[transaction.originalChipCurrency] -= holdingDifference;
         
-        // If holding amount becomes 0 or negative, remove the currency
-        if (newHoldings[transaction.originalChipCurrency] <= 0) {
+        // If holding amount becomes very small (using currency-specific threshold), remove the currency
+        const threshold = CURRENCY_THRESHOLDS[transaction.originalChipCurrency] || 0.01;
+        if (Math.abs(newHoldings[transaction.originalChipCurrency]) <= threshold) {
           delete newHoldings[transaction.originalChipCurrency];
         }
       }

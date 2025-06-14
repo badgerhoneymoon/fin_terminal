@@ -6,6 +6,7 @@ import { Bucket as BucketType, Transaction, Chip } from '@/lib/types';
 import { useBudget } from '@/lib/context/budget-context';
 import { useState, useEffect } from 'react';
 import { TransactionHistoryModal } from '../../transaction/TransactionHistoryModal';
+import { TransactionChartModal } from './TransactionChartModal';
 import { BucketProgressBar } from './BucketProgressBar';
 import { BucketHoldings } from './BucketHoldings';
 import { BucketMenu } from './BucketMenu';
@@ -21,8 +22,10 @@ export function Bucket({ bucket, activeChip }: BucketProps) {
   const [isShaking, setIsShaking] = useState(false);
   const [isFlashing, setIsFlashing] = useState(false);
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
 
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
+  const [showTransactionChart, setShowTransactionChart] = useState(false);
   
   // Check if the current drag is valid for this bucket
   const isValidDropTarget = !activeChip || 
@@ -50,15 +53,14 @@ export function Bucket({ bucket, activeChip }: BucketProps) {
         return 100 - utilization; // 0% owed = 100% progress
       })();
 
-
-
-  // Get recent transactions for this bucket (last 20)
+  // Get transactions for this bucket
   useEffect(() => {
     const bucketTransactions = state.transactions
       .filter((t: Transaction) => t.bucketId === bucket.id)
-      .sort((a: Transaction, b: Transaction) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, 20);
-    setRecentTransactions(bucketTransactions);
+      .sort((a: Transaction, b: Transaction) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    
+    setAllTransactions(bucketTransactions);
+    setRecentTransactions(bucketTransactions.slice(0, 20));
   }, [state.transactions, bucket.id]);
 
   // Trigger animations based on new milestones
@@ -107,6 +109,7 @@ export function Bucket({ bucket, activeChip }: BucketProps) {
         recentTransactions={recentTransactions}
         progress={progress}
         onShowTransactionHistory={() => setShowTransactionHistory(true)}
+        onShowTransactionChart={() => setShowTransactionChart(true)}
       >
         <BucketMenu bucketId={bucket.id} onReset={resetBucket} />
       </BucketHeader>
@@ -114,7 +117,8 @@ export function Bucket({ bucket, activeChip }: BucketProps) {
       {/* Holdings Breakdown - only show if bucket has holdings */}
       <BucketHoldings 
         holdings={bucket.holdings} 
-        exchangeRates={state.exchangeRates.rates} 
+        exchangeRates={state.exchangeRates.rates}
+        bucketCurrency={bucket.currency}
       />
 
       <BucketProgressBar bucket={bucket} />
@@ -125,6 +129,14 @@ export function Bucket({ bucket, activeChip }: BucketProps) {
         onClose={() => setShowTransactionHistory(false)}
         bucket={bucket}
         transactions={recentTransactions}
+      />
+
+      {/* Transaction Chart Modal */}
+      <TransactionChartModal 
+        isOpen={showTransactionChart}
+        onClose={() => setShowTransactionChart(false)}
+        bucket={bucket}
+        transactions={allTransactions}
       />
 
     </motion.div>

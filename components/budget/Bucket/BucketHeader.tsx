@@ -2,12 +2,14 @@
 
 import { Bucket as BucketType, CURRENCIES } from '@/lib/types';
 import { formatSmartAmount } from '@/lib/utils';
+import { BarChart3 } from 'lucide-react';
 
 interface BucketHeaderProps {
   bucket: BucketType;
   recentTransactions: { amount: number }[];
   progress: number;
   onShowTransactionHistory: () => void;
+  onShowTransactionChart: () => void;
   children?: React.ReactNode; // for menu injection
 }
 
@@ -15,7 +17,8 @@ export function BucketHeader({
   bucket, 
   recentTransactions, 
   progress, 
-  onShowTransactionHistory, 
+  onShowTransactionHistory,
+  onShowTransactionChart,
   children 
 }: BucketHeaderProps) {
   const currency = CURRENCIES[bucket.currency];
@@ -53,6 +56,15 @@ export function BucketHeader({
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Chart button */}
+        <button
+          onClick={onShowTransactionChart}
+          className="p-2 text-[var(--text-primary)] opacity-50 hover:opacity-80 hover:text-[var(--text-accent)] transition-all duration-200 hover:scale-110"
+          title="View transaction chart"
+        >
+          <BarChart3 size={18} />
+        </button>
+
         {/* Recent transaction */}
         {recentTransactions.length > 0 && (
           <button
