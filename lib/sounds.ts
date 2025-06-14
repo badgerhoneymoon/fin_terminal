@@ -17,88 +17,54 @@ export class SoundManager {
   }
 
   private initializeSounds() {
-    // Create synthetic sounds using Web Audio API
-    this.createSyntheticSounds();
+    // Load actual sound files
+    this.loadSoundFiles();
   }
 
-  private createSyntheticSounds() {
+  private loadSoundFiles() {
     try {
-      const audioContext = new (window.AudioContext || (window as unknown as {webkitAudioContext: typeof AudioContext}).webkitAudioContext)();
-      
-      // Create mint sound (higher pitched beep)
-      const mintSound = this.createBeep(audioContext, 800, 0.1, 'mint');
+      // Create mint sound (waterdrop sound for chip minting)
+      const mintSound = new Audio('/sounds/OS_CASH_perc_water_drop.wav');
+      mintSound.volume = 0.2;
+      mintSound.preload = 'auto';
       this.sounds.set('mint', mintSound);
 
-      // Create drop sound (lower pitched beep)
-      const dropSound = this.createBeep(audioContext, 400, 0.15, 'drop');
+      // Create drop sound (cash register sound for chip dropping)
+      const dropSound = new Audio('/sounds/CashRegister_S08OF.38.wav');
+      dropSound.volume = 0.2;
+      dropSound.preload = 'auto';
       this.sounds.set('drop', dropSound);
 
-      // Create milestone sound (celebration tone)
-      const milestoneSound = this.createBeep(audioContext, 600, 0.3, 'milestone');
+      // Create milestone sound (same as drop for now, can be customized later)
+      const milestoneSound = new Audio('/sounds/CashRegister_S08OF.38.wav');
+      milestoneSound.volume = 0.2;
+      milestoneSound.preload = 'auto';
       this.sounds.set('milestone', milestoneSound);
 
+      // Create delete sound (BWU sound for clearing/deleting operations)
+      const deleteSound = new Audio('/sounds/CashRegister_BWU.73.wav');
+      deleteSound.volume = 0.2;
+      deleteSound.preload = 'auto';
+      this.sounds.set('delete', deleteSound);
+
+      // Create sum sound (BRS sound for when adding numbers to sum with space)
+      const sumSound = new Audio('/sounds/BRS_Beep_Cash_Counter_Single.wav');
+      sumSound.volume = 0.2;
+      sumSound.preload = 'auto';
+      this.sounds.set('sum', sumSound);
+
+      // Create negate sound (snap pleaser sound for switching between positive/negative)
+      const negateSound = new Audio('/sounds/OS_CASH_snap_pleaser.wav');
+      negateSound.volume = 0.2;
+      negateSound.preload = 'auto';
+      this.sounds.set('negate', negateSound);
+
     } catch (error) {
-      console.warn('Could not initialize Web Audio API:', error);
+      console.warn('Could not load sound files:', error);
     }
   }
 
-  private createBeep(audioContext: AudioContext, frequency: number, duration: number, type: string): HTMLAudioElement {
-    // Create a data URL for the audio
-    const sampleRate = audioContext.sampleRate;
-    const numSamples = Math.floor(sampleRate * duration);
-    const buffer = new ArrayBuffer(44 + numSamples * 2);
-    const view = new DataView(buffer);
 
-    // WAV header
-    const writeString = (offset: number, string: string) => {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
-    };
-
-    writeString(0, 'RIFF');
-    view.setUint32(4, 36 + numSamples * 2, true);
-    writeString(8, 'WAVE');
-    writeString(12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, 1, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2, true);
-    view.setUint16(32, 2, true);
-    view.setUint16(34, 16, true);
-    writeString(36, 'data');
-    view.setUint32(40, numSamples * 2, true);
-
-    // Generate sine wave
-    for (let i = 0; i < numSamples; i++) {
-      const t = i / sampleRate;
-      let amplitude = Math.sin(2 * Math.PI * frequency * t);
-      
-      // Apply envelope (fade out)
-      amplitude *= Math.max(0, 1 - t / duration);
-      
-      // Add some character based on type
-      if (type === 'mint') {
-        amplitude *= 0.3; // Softer
-      } else if (type === 'drop') {
-        amplitude *= 0.4; // Medium
-      } else if (type === 'milestone') {
-        amplitude *= 0.5; // Louder
-        amplitude += Math.sin(2 * Math.PI * frequency * 1.5 * t) * 0.2; // Add harmonic
-      }
-
-      const sample = Math.max(-1, Math.min(1, amplitude)) * 32767;
-      view.setInt16(44 + i * 2, sample, true);
-    }
-
-    const blob = new Blob([buffer], { type: 'audio/wav' });
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.volume = 0.3;
-    
-    return audio;
-  }
 
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
@@ -130,6 +96,18 @@ export class SoundManager {
 
   playMilestone() {
     this.play('milestone');
+  }
+
+  playDelete() {
+    this.play('delete');
+  }
+
+  playSum() {
+    this.play('sum');
+  }
+
+  playNegate() {
+    this.play('negate');
   }
 }
 

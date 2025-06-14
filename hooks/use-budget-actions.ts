@@ -45,10 +45,16 @@ export const useBudgetActions = ({ state, dispatch }: UseBudgetActionsProps) => 
 
   const removeChip = (chipId: string) => {
     dispatch({ type: 'REMOVE_CHIP', payload: { chipId } });
+    if (state.soundEnabled) {
+      soundManager.playDelete();
+    }
   };
 
   const clearChips = () => {
     dispatch({ type: 'CLEAR_CHIPS' });
+    if (state.soundEnabled) {
+      soundManager.playDelete();
+    }
   };
 
   const resetBucket = (bucketId: string) => {
@@ -57,10 +63,16 @@ export const useBudgetActions = ({ state, dispatch }: UseBudgetActionsProps) => 
 
   const deleteTransaction = (transactionId: string) => {
     dispatch({ type: 'DELETE_TRANSACTION', payload: { transactionId } });
+    if (state.soundEnabled) {
+      soundManager.playDelete();
+    }
   };
 
   const updateTransaction = (transactionId: string, newAmount: number) => {
     dispatch({ type: 'UPDATE_TRANSACTION', payload: { transactionId, newAmount } });
+    if (state.soundEnabled) {
+      soundManager.playDrop();
+    }
   };
 
   const convertChipPolarity = (chipId: string, isNegative: boolean) => {

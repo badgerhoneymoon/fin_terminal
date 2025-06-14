@@ -1,11 +1,16 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBudget } from '@/lib/budget-context';
 import { CURRENCIES, Currency } from '@/lib/types';
-import { Chip } from './Chip';
+import { CurrencySelector } from './CurrencySelector';
+import { SumInput } from './SumInput';
+import { ChipTray } from './ChipTray';
 import { formatSmartAmount } from '@/lib/utils';
+import { soundManager } from '@/lib/sounds';
+import { useSumCalculator } from '@/hooks/useSumCalculator';
+import { useKeyboardInput } from '@/hooks/useKeyboardInput';
 
 export function StagingTray() {
   const { state, mintChip, clearChips, convertChipPolarity } = useBudget();
@@ -14,48 +19,62 @@ export function StagingTray() {
   const [showToast, setShowToast] = useState(false);
   const [isNegative, setIsNegative] = useState(false);
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const amountInputRef = useRef<HTMLInputElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => {
-      if (isDropdownOpen) {
-        setIsDropdownOpen(false);
-      }
-    };
-    
-    if (isDropdownOpen) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [isDropdownOpen]);
+  const {
+    sumNumbers,
+    setSumNumbers,
+    currentInput,
+    setCurrentInput,
+    calculateSum,
+    clearAll,
+    removeNumberAt,
+  } = useSumCalculator({ soundEnabled: state.soundEnabled });
 
   const handleMint = () => {
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
+    let finalAmount: number;
+    
+    if (sumNumbers.length > 0) {
+      // If we have numbers in the sum, use the total
+      finalAmount = calculateSum();
+    } else {
+      // Otherwise use the regular amount
+      finalAmount = parseFloat(amount);
+    }
+    
+    if (isNaN(finalAmount) || finalAmount <= 0) {
       return;
     }
 
-    mintChip(numAmount, currency, isNegative);
+    mintChip(finalAmount, currency, isNegative);
     setAmount('');
+    setCurrentInput('');
+    setSumNumbers([]);
     
     // Show toast
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleMint();
-    }
-  };
+  const { handleKeyPress, handleKeyDown } = useKeyboardInput({
+    amount,
+    setAmount,
+    sumNumbers,
+    setSumNumbers,
+    currentInput,
+    setCurrentInput,
+    onMint: handleMint,
+    soundEnabled: state.soundEnabled,
+  });
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     // Remove any existing currency symbols and formatting (keep only digits and decimal point)
     const cleanValue = value.replace(/[^\d.]/g, '');
-    setAmount(cleanValue);
+    
+    if (sumNumbers.length > 0) {
+      setCurrentInput(cleanValue);
+    } else {
+      setAmount(cleanValue);
+    }
   };
 
   const formatDisplayValue = (value: string, curr: Currency) => {
@@ -70,9 +89,21 @@ export function StagingTray() {
     return `${symbol}${formattedValue}`;
   };
 
+  const getDisplayValue = () => {
+    if (sumNumbers.length > 0) {
+      return currentInput ? formatDisplayValue(currentInput, currency) : '';
+    }
+    return amount ? formatDisplayValue(amount, currency) : '';
+  };
+
   const handlePolarityToggle = () => {
     const newIsNegative = !isNegative;
     setIsNegative(newIsNegative);
+    
+    // Play negate sound
+    if (state.soundEnabled) {
+      soundManager.playNegate();
+    }
     
     // Convert existing chips if any exist
     if (state.chips.length > 0) {
@@ -104,80 +135,44 @@ export function StagingTray() {
         {/* Mint Button */}
         <button
           onClick={handleMint}
-          disabled={!amount || parseFloat(amount) <= 0}
+          disabled={(!amount && sumNumbers.length === 0) || (sumNumbers.length > 0 ? calculateSum() <= 0 : parseFloat(amount) <= 0)}
           className="flex items-center justify-center w-10 h-10 btn-primary text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           title="Mint Chip"
         >
           →
         </button>
 
-        {/* Currency Selector - moved to left */}
-        <div className="relative">
-          <button
-            className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-mono min-w-[80px] justify-between"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsDropdownOpen(!isDropdownOpen);
-            }}
-            title="Select currency"
-          >
-            <div className="flex items-center gap-1">
-              <span>{CURRENCIES[currency].symbol}</span>
-              <span className="font-bold">{currency}</span>
-            </div>
-            <span className={`text-xs transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}>▼</span>
-          </button>
-          
-          {isDropdownOpen && (
-            <div className="absolute top-full left-0 mt-1 bg-black border border-[var(--text-primary)] z-50 min-w-[120px]">
-              {Object.entries(CURRENCIES).map(([code, currencyData]) => (
-                <button
-                  key={code}
-                  className={`w-full px-4 py-2 text-left text-sm font-mono transition-colors
-                    ${currency === code 
-                      ? 'bg-[var(--text-primary)] text-black' 
-                      : 'text-[var(--text-primary)] hover:bg-white hover:bg-opacity-10 hover:text-white'
-                    }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrency(code as Currency);
-                    setIsDropdownOpen(false);
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>{currencyData.symbol}</span>
-                    <span className="font-bold">{code}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 relative">
-          <input
-            ref={amountInputRef}
-            type="text"
-            value={amount ? formatDisplayValue(amount, currency) : ''}
-            onChange={handleAmountChange}
-            onKeyPress={handleKeyPress}
-            placeholder={`Amount (${CURRENCIES[currency].symbol})`}
-            className="w-full input-terminal"
-            aria-label="Chip amount"
-          />
-        </div>
+        {/* Currency Selector */}
+        <CurrencySelector 
+          currency={currency}
+          onCurrencyChange={setCurrency}
+        />
+        <SumInput
+          currency={currency}
+          sumNumbers={sumNumbers}
+          currentInput={currentInput}
+          getDisplayValue={getDisplayValue}
+          handleAmountChange={handleAmountChange}
+          handleKeyPress={handleKeyPress}
+          handleKeyDown={handleKeyDown}
+          removeNumberAt={removeNumberAt}
+          onClearAll={() => {
+            clearAll();
+            setAmount('');
+          }}
+        />
 
         {/* Arrow and USD conversion */}
         <div className="flex items-center gap-2">
           <div className="text-[var(--text-primary)] font-bold">→</div>
-          {amount && parseFloat(amount) > 0 && (
+          {((amount && parseFloat(amount) > 0) || (sumNumbers.length > 0 && calculateSum() > 0)) && (
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="text-[var(--text-primary)] text-sm font-mono"
             >
               ${(() => {
-                const num = parseFloat(amount) || 0;
+                const num = sumNumbers.length > 0 ? calculateSum() : parseFloat(amount) || 0;
                 if (currency === 'USD') return formatSmartAmount(num, 'USD');
                 const rate = state.exchangeRates.rates[currency as keyof typeof state.exchangeRates.rates];
                 if (!rate || rate === 0 || isNaN(rate)) return '?';
@@ -191,44 +186,12 @@ export function StagingTray() {
         </div>
       </div>
 
-      {/* Chip Display Area - Color coded based on mode */}
-      <motion.div 
-        className={`min-h-[60px] p-3 glass-panel border-2 rounded-sm transition-all duration-300 ${
-          isNegative 
-            ? 'border-red-500 bg-red-900/10 shadow-lg shadow-red-500/20' 
-            : 'border-[var(--text-primary)] bg-green-900/5 shadow-lg shadow-green-500/10'
-        }`}
-        animate={{
-          borderColor: isNegative ? '#ef4444' : 'var(--text-primary)',
-          backgroundColor: isNegative ? 'rgba(127, 29, 29, 0.1)' : 'rgba(21, 128, 61, 0.05)'
-        }}
-        transition={{ duration: 0.3 }}
-      >
-        {state.chips.length === 0 ? (
-          <div className="flex items-center justify-center h-12 text-[var(--text-primary)] opacity-40">
-            <div className={`text-sm font-mono font-bold transition-colors duration-300 ${
-              isNegative ? 'text-red-400' : 'text-green-400'
-            }`}>
-              {isNegative ? 'SPENDING MODE' : 'DREAM MODE'}
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-3 items-start">
-            <AnimatePresence>
-              {state.chips.map((chip) => (
-                <Chip key={chip.id} chip={chip} />
-              ))}
-            </AnimatePresence>
-            <button
-              onClick={clearChips}
-              className="text-[var(--text-accent)] hover:text-red-400 transition-colors text-xs font-bold ml-auto"
-              title="Clear all chips"
-            >
-              CLEAR ALL
-            </button>
-          </div>
-        )}
-      </motion.div>
+      {/* Chip Display Area */}
+      <ChipTray
+        chips={state.chips}
+        isNegative={isNegative}
+        onClearChips={clearChips}
+      />
 
       {/* Toast Notification - Centered Bottom */}
       <AnimatePresence>

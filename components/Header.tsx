@@ -153,20 +153,20 @@ export function Header({ layoutMode = 'compact', onLayoutModeChange }: HeaderPro
           <div className="flex border border-[var(--text-primary)] text-xs h-10">
             <button
               onClick={() => onLayoutModeChange('compact')}
-              className={`px-4 py-2 h-full transition-all duration-300 font-mono flex items-center ${
+              className={`px-4 py-2 h-full transition-all duration-300 font-mono flex items-center font-semibold ${
                 layoutMode === 'compact'
-                  ? 'bg-[var(--text-accent)] text-black'
-                  : 'text-[var(--text-primary)] hover:text-[var(--text-accent)]'
+                  ? 'bg-[#C400C4] text-white'
+                  : 'text-[var(--text-primary)] hover:brightness-110'
               }`}
             >
               COMPACT
             </button>
             <button
               onClick={() => onLayoutModeChange('individual')}
-              className={`px-4 py-2 h-full transition-all duration-300 font-mono flex items-center ${
+              className={`px-4 py-2 h-full transition-all duration-300 font-mono flex items-center font-semibold ${
                 layoutMode === 'individual'
-                  ? 'bg-[var(--text-accent)] text-black'
-                  : 'text-[var(--text-primary)] hover:text-[var(--text-accent)]'
+                  ? 'bg-[#C400C4] text-white'
+                  : 'text-[var(--text-primary)] hover:brightness-110'
               }`}
             >
               DETAILED
@@ -190,8 +190,8 @@ export function Header({ layoutMode = 'compact', onLayoutModeChange }: HeaderPro
         </button>
 
         {/* Exchange Rates Indicator */}
-        <div className="flex items-center gap-2 h-10 px-3 border border-[var(--text-primary)] text-xs text-[var(--text-primary)] opacity-75">
-          <div className="font-mono">FX:</div>
+        <div className="flex items-center gap-2 h-10 px-3 border border-[var(--text-primary)] text-xs text-[var(--text-primary)]">
+          <div className="font-mono font-semibold">FX:</div>
           <div 
             className={`w-2 h-2 rounded-full ${
               state.exchangeRates.status === 'success' ? 'bg-emerald-400' :
