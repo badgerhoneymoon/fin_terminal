@@ -3,14 +3,14 @@
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useBudget } from '@/lib/budget-context';
-import { Header } from './Header';
-import { Footer } from './Footer';
-import { Bucket } from './Bucket';
+import { useBudget } from '@/lib/context/budget-context';
+import { Header } from '../layout/Header';
+import { Footer } from '../layout/Footer';
+import { Bucket } from './Bucket/Bucket';
 import { CompactGoals } from './CompactGoals';
-import { StagingTray } from './StagingTray';
-import { Chip } from './Chip';
-import { Chip as ChipType } from '@/lib/types';
+import { StagingTray } from '../trays/StagingTray';
+import { Chip } from '../inputs/Chip';
+import { Chip as ChipType, Bucket as BucketType } from '@/lib/types';
 
 export function BudgetDrop() {
   const { state, dropChip } = useBudget();
@@ -39,7 +39,7 @@ export function BudgetDrop() {
 
     // Check if dropped on a bucket (handle both regular and compact IDs)
     const bucketId = overId.startsWith('compact-') ? overId.replace('compact-', '') : overId;
-    const bucket = state.buckets.find(b => b.id === bucketId);
+    const bucket = state.buckets.find((b: BucketType) => b.id === bucketId);
     if (bucket) {
       dropChip(chip.id, bucket.id);
     }
@@ -88,7 +88,7 @@ export function BudgetDrop() {
                   <CompactGoals activeChip={activeChip} />
                 ) : (
                   <div className="space-y-4">
-                    {state.buckets.map((bucket, index) => (
+                    {state.buckets.map((bucket: BucketType, index: number) => (
                       <motion.div
                         key={bucket.id}
                         initial={{ opacity: 0, x: -20 }}

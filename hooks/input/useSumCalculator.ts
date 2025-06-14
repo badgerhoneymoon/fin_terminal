@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { soundManager } from '@/lib/sounds';
+import { soundManager } from '@/lib/sound/sounds';
 
 interface UseSumCalculatorOptions {
   soundEnabled?: boolean;

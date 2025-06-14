@@ -1,12 +1,12 @@
 'use client';
 
 import { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { BudgetState, BudgetAction } from './types';
-import { budgetReducer, initialState } from './budget-reducer';
-import { soundManager } from './sounds';
-import { useExchangeRates } from '../hooks/use-exchange-rates';
-import { useBudgetActions } from '../hooks/use-budget-actions';
-import { useStateHydration } from '../hooks/use-state-hydration';
+import { BudgetState, BudgetAction } from '../types';
+import { budgetReducer, initialState } from '../reducers/budget-reducer';
+import { soundManager } from '../sound/sounds';
+import { useExchangeRates } from '@/hooks/budget/use-exchange-rates';
+import { useBudgetActions } from '@/hooks/budget/use-budget-actions';
+import { useStateHydration } from '@/hooks/budget/use-state-hydration';
 
 interface BudgetContextType {
   state: BudgetState;

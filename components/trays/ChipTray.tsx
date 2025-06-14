@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chip } from './Chip';
+import { Chip } from '../inputs/Chip';
 import { Chip as ChipType } from '@/lib/types';
 
 interface ChipTrayProps {

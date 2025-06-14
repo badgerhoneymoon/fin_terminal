@@ -7,7 +7,6 @@ import { formatSmartAmount } from '@/lib/utils';
 interface SumInputProps {
   currency: Currency;
   sumNumbers: number[];
-  currentInput: string;
   getDisplayValue: () => string;
   handleAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyPress: (e: React.KeyboardEvent) => void;
@@ -19,7 +18,6 @@ interface SumInputProps {
 export function SumInput({
   currency,
   sumNumbers,
-  currentInput,
   getDisplayValue,
   handleAmountChange,
   handleKeyPress,

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { BudgetState, BudgetAction } from '../lib/types';
-import { StorageService } from '../lib/services/storage-service';
+import { BudgetState, BudgetAction } from '@/lib/types';
+import { StorageService } from '@/lib/services/storage';
 
 interface UseStateHydrationProps {
   state: BudgetState;

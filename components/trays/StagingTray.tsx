@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useBudget } from '@/lib/budget-context';
-import { CURRENCIES, Currency } from '@/lib/types';
-import { CurrencySelector } from './CurrencySelector';
-import { SumInput } from './SumInput';
+import { useBudget } from '@/lib/context/budget-context';
+import { CURRENCIES, Currency, Chip } from '@/lib/types';
+import { CurrencySelector } from '../inputs/CurrencySelector';
+import { SumInput } from '../inputs/SumInput';
 import { ChipTray } from './ChipTray';
 import { formatSmartAmount } from '@/lib/utils';
-import { soundManager } from '@/lib/sounds';
-import { useSumCalculator } from '@/hooks/useSumCalculator';
-import { useKeyboardInput } from '@/hooks/useKeyboardInput';
+import { soundManager } from '@/lib/sound/sounds';
+import { useSumCalculator } from '@/hooks/input/useSumCalculator';
+import { useKeyboardInput } from '@/hooks/input/useKeyboardInput';
 
 export function StagingTray() {
   const { state, mintChip, clearChips, convertChipPolarity } = useBudget();
@@ -107,7 +107,7 @@ export function StagingTray() {
     
     // Convert existing chips if any exist
     if (state.chips.length > 0) {
-      state.chips.forEach(chip => {
+      state.chips.forEach((chip: Chip) => {
         if (chip.isNegative !== newIsNegative) {
           convertChipPolarity(chip.id, newIsNegative);
         }
@@ -150,7 +150,6 @@ export function StagingTray() {
         <SumInput
           currency={currency}
           sumNumbers={sumNumbers}
-          currentInput={currentInput}
           getDisplayValue={getDisplayValue}
           handleAmountChange={handleAmountChange}
           handleKeyPress={handleKeyPress}

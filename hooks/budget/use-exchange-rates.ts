@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
-import { BudgetAction } from '../lib/types';
-import { CurrencyService } from '../lib/services/currency-service';
+import { BudgetAction } from '@/lib/types';
+import { CurrencyService } from '@/lib/services/currency';
 
 interface UseExchangeRatesProps {
   dispatch: React.Dispatch<BudgetAction>;

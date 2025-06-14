@@ -1,6 +1,6 @@
-import { BudgetState, BudgetAction, Currency } from '../lib/types';
-import { soundManager } from '../lib/sounds';
-import { StorageService } from '../lib/services/storage-service';
+import { BudgetState, BudgetAction, Currency } from '@/lib/types';
+import { soundManager } from '@/lib/sound/sounds';
+import { StorageService } from '@/lib/services/storage';
 
 interface UseBudgetActionsProps {
   state: BudgetState;

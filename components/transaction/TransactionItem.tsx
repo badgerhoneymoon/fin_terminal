@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Transaction, Bucket, CURRENCIES } from '@/lib/types';
-import { useBudget } from '@/lib/budget-context';
+import { useBudget } from '@/lib/context/budget-context';
 import { formatSmartAmount } from '@/lib/utils';
 import { useState } from 'react';
 

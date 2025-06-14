@@ -1,7 +1,7 @@
-import { BudgetState, BudgetAction, Chip, DEFAULT_BUCKETS } from './types';
-import { handleDropChip } from './drop-chip-handler';
-import { handleUpdateTransaction } from './update-transaction-handler';
-import { handleDeleteTransaction } from './delete-transaction-handler';
+import { BudgetState, BudgetAction, Chip, DEFAULT_BUCKETS } from '../types';
+import { handleDropChip } from '../handlers/drop-chip';
+import { handleUpdateTransaction } from '../handlers/update-transaction';
+import { handleDeleteTransaction } from '../handlers/delete-transaction';
 
 
 /**

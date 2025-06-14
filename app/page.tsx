@@ -1,5 +1,5 @@
-import { BudgetProvider } from '@/lib/budget-context';
-import { BudgetDrop } from '@/components/BudgetDrop';
+import { BudgetProvider } from '@/lib/context/budget-context';
+import { BudgetDrop } from '@/components/budget/BudgetDrop';
 
 export default function Home() {
   return (

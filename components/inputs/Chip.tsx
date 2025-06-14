@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useDraggable } from '@dnd-kit/core';
 import { Chip as ChipType, CURRENCIES } from '@/lib/types';
-import { useBudget } from '@/lib/budget-context';
+import { useBudget } from '@/lib/context/budget-context';
 
 interface ChipProps {
   chip: ChipType;

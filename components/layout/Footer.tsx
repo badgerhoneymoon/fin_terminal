@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useBudget } from '@/lib/budget-context';
+import { useBudget } from '@/lib/context/budget-context';
 
 export function Footer() {
   const { state, exportData, importData } = useBudget();

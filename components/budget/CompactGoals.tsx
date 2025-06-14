@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import { useDroppable } from '@dnd-kit/core';
 import { useState, useEffect } from 'react';
 import { Bucket as BucketType, CURRENCIES, Chip, Transaction } from '@/lib/types';
-import { useBudget } from '@/lib/budget-context';
+import { useBudget } from '@/lib/context/budget-context';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { TransactionHistoryModal } from '@/components/TransactionHistoryModal';
+import { TransactionHistoryModal } from '../transaction/TransactionHistoryModal';
 import { formatSmartAmount } from '@/lib/utils';
 
 // Separate component for each mini progress circle
@@ -164,8 +164,8 @@ export function CompactGoals({ activeChip }: CompactGoalsProps) {
   useEffect(() => {
     if (selectedBucket) {
       const bucketTransactions = state.transactions
-        .filter(t => t.bucketId === selectedBucket.id)
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .filter((t: Transaction) => t.bucketId === selectedBucket.id)
+        .sort((a: Transaction, b: Transaction) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         .slice(0, 20);
       setRecentTransactions(bucketTransactions);
     }
@@ -191,7 +191,7 @@ export function CompactGoals({ activeChip }: CompactGoalsProps) {
     >
       {/* Circular Progress */}
       <div className="flex justify-center items-center gap-12">
-        {state.buckets.slice(0, 4).map((bucket, index) => 
+        {state.buckets.slice(0, 4).map((bucket: BucketType, index: number) => 
           <MiniCircularProgress 
             key={bucket.id} 
             bucket={bucket} 
@@ -215,7 +215,7 @@ export function CompactGoals({ activeChip }: CompactGoalsProps) {
           </div>
           <div className="text-white font-semibold">
             {(() => {
-              const totalProgress = state.buckets.reduce((sum, bucket) => {
+              const totalProgress = state.buckets.reduce((sum: number, bucket: BucketType) => {
                 const progress = bucket.type === 'fund' 
                   ? (bucket.current / bucket.target) * 100
                   : (() => {

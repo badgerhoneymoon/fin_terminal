@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useBudget } from '@/lib/budget-context';
+import { useBudget } from '@/lib/context/budget-context';
 import { useState, useEffect } from 'react';
 
 interface HeaderProps {

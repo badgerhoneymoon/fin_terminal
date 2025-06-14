@@ -1,4 +1,4 @@
-import { soundManager } from '@/lib/sounds';
+import { soundManager } from '@/lib/sound/sounds';
 
 interface UseKeyboardInputOptions {
   // Main amount state
