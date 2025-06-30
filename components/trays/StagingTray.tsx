@@ -53,6 +53,11 @@ export function StagingTray() {
     setSumNumbers([]);
     setNote('');
     
+    // Focus back to amount input for next entry
+    setTimeout(() => {
+      sumInputRef.current?.focus();
+    }, 100);
+    
     // Show toast
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
