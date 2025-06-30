@@ -13,6 +13,7 @@ interface UseKeyboardInputOptions {
   
   // Actions
   onMint: () => void;
+  onEnterFromAmount?: () => void;
   
   // Settings
   soundEnabled?: boolean;
@@ -27,12 +28,27 @@ export function useKeyboardInput(options: UseKeyboardInputOptions) {
     currentInput,
     setCurrentInput,
     onMint,
+    onEnterFromAmount,
     soundEnabled = false,
   } = options;
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      onMint();
+      // Check if there's an amount to process
+      const currentNum = parseFloat(currentInput) || 0;
+      const totalSum = sumNumbers.reduce((sum, num) => sum + num, 0) + currentNum;
+      const singleAmount = parseFloat(amount) || 0;
+      
+      const hasAmount = (sumNumbers.length > 0 && totalSum > 0) || 
+                       (sumNumbers.length === 0 && singleAmount > 0);
+      
+      if (hasAmount && onEnterFromAmount) {
+        // Move to note field instead of minting immediately
+        onEnterFromAmount();
+      } else {
+        // No amount, so just mint (this handles the case from note field)
+        onMint();
+      }
     } else if (e.key === ' ') {
       e.preventDefault();
       

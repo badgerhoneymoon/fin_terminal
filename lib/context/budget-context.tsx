@@ -11,7 +11,7 @@ import { useStateHydration } from '@/hooks/budget/use-state-hydration';
 interface BudgetContextType {
   state: BudgetState;
   dispatch: React.Dispatch<BudgetAction>;
-  mintChip: (amount: number, currency: string, isNegative?: boolean) => void;
+  mintChip: (amount: number, currency: string, isNegative?: boolean, note?: string) => void;
   dropChip: (chipId: string, bucketId: string) => void;
   removeChip: (chipId: string) => void;
   clearChips: () => void;

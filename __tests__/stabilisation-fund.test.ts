@@ -1,4 +1,4 @@
-import { budgetReducer, initialState } from '@/lib/budget-reducer';
+import { budgetReducer, initialState } from '@/lib/reducers/budget-reducer';
 import type { BudgetState, Currency } from '@/lib/types';
 
 // Helper to get bucket by id
@@ -31,7 +31,7 @@ describe('Stabilisation Fund – currency chip allocation', () => {
     // Act – mint & drop USD 100 chip
     state = budgetReducer(state, {
       type: 'MINT_CHIP',
-      payload: { amount: 100, currency: 'USD' }
+      payload: { amount: 100, currency: 'USD', note: 'Test salary payment' }
     });
     const usdChip = state.chips.find(c => c.currency === 'USD')!;
     state = budgetReducer(state, {
@@ -43,6 +43,10 @@ describe('Stabilisation Fund – currency chip allocation', () => {
     let fund = getBucket(state, fundId);
     expect(fund.current).toBe(startingCurrent + 100);
     expect(fund.holdings?.USD).toBe(100);
+    
+    // Assert – note is preserved in transaction
+    const transaction = state.transactions.find(t => t.bucketId === fundId);
+    expect(transaction?.note).toBe('Test salary payment');
 
     // Act – mint & drop EUR 100 chip (worth 110 USD)
     state = budgetReducer(state, {

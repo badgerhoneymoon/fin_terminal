@@ -8,8 +8,8 @@ interface UseBudgetActionsProps {
 }
 
 export const useBudgetActions = ({ state, dispatch }: UseBudgetActionsProps) => {
-  const mintChip = (amount: number, currency: string, isNegative?: boolean) => {
-    dispatch({ type: 'MINT_CHIP', payload: { amount, currency: currency as Currency, isNegative } });
+  const mintChip = (amount: number, currency: string, isNegative?: boolean, note?: string) => {
+    dispatch({ type: 'MINT_CHIP', payload: { amount, currency: currency as Currency, isNegative, note } });
     if (state.soundEnabled) {
       soundManager.playMint();
     }

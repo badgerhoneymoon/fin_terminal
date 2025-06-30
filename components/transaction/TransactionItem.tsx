@@ -171,6 +171,11 @@ export function TransactionItem({
                 </span>
               )}
             </div>
+            {transaction.note && (
+              <div className="text-xs text-[var(--text-primary)] opacity-90 mt-1 italic">
+                &ldquo;{transaction.note}&rdquo;
+              </div>
+            )}
           </div>
         </div>
         

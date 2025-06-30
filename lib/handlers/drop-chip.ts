@@ -1,4 +1,4 @@
-import { BudgetState, Bucket, Chip, Transaction } from './types';
+import { BudgetState, Bucket, Chip, Transaction } from '../types';
 
 export function handleDropChip(
   state: BudgetState,
@@ -43,7 +43,8 @@ export function handleDropChip(
             currency: chip.currency,
             usdRate: chip.usdRate,
             createdAt: new Date(),
-            isNegative: true
+            isNegative: true,
+            note: chip.note
           };
         }
       }
@@ -66,7 +67,8 @@ export function handleDropChip(
           currency: chip.currency,
           usdRate: chip.usdRate,
           createdAt: new Date(),
-          isNegative: false
+          isNegative: false,
+          note: chip.note
         };
       } else {
         newCurrent = bucket.current - actualAmount;
@@ -93,7 +95,8 @@ export function handleDropChip(
         currency: chip.currency,
         usdRate: chip.usdRate,
         createdAt: new Date(),
-        isNegative: false
+        isNegative: false,
+        note: chip.note
       };
     } else {
       newCurrent = bucket.current + actualAmount;
@@ -109,7 +112,8 @@ export function handleDropChip(
     type: transactionType,
     originalChipAmount: chip.amount,
     originalChipCurrency: chip.currency,
-    usdRateAtTime: chip.usdRate
+    usdRateAtTime: chip.usdRate,
+    note: chip.note
   };
 
   // Update holdings for fund buckets

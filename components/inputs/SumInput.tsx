@@ -13,6 +13,7 @@ interface SumInputProps {
   handleKeyDown: (e: React.KeyboardEvent) => void;
   removeNumberAt: (index: number) => void;
   onClearAll: () => void;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export function SumInput({
@@ -24,8 +25,10 @@ export function SumInput({
   handleKeyDown,
   removeNumberAt,
   onClearAll,
+  inputRef: externalInputRef,
 }: SumInputProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const internalInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = externalInputRef || internalInputRef;
 
   return (
     <div className="flex-1 relative">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBudget } from '@/lib/context/budget-context';
 import { CURRENCIES, Currency, Chip } from '@/lib/types';
@@ -18,6 +18,9 @@ export function StagingTray() {
   const [currency, setCurrency] = useState<Currency>('USD');
   const [showToast, setShowToast] = useState(false);
   const [isNegative, setIsNegative] = useState(false);
+  const [note, setNote] = useState('');
+  const sumInputRef = useRef<HTMLInputElement>(null);
+  const noteInputRef = useRef<HTMLInputElement>(null);
 
   const {
     sumNumbers,
@@ -44,14 +47,29 @@ export function StagingTray() {
       return;
     }
 
-    mintChip(finalAmount, currency, isNegative);
+    mintChip(finalAmount, currency, isNegative, note);
     setAmount('');
     setCurrentInput('');
     setSumNumbers([]);
+    setNote('');
     
     // Show toast
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
+  };
+
+  const handleCurrencyChange = (newCurrency: Currency) => {
+    setCurrency(newCurrency);
+    // Focus the amount input after currency selection
+    setTimeout(() => {
+      sumInputRef.current?.focus();
+    }, 100);
+  };
+
+  const handleFocusNote = () => {
+    setTimeout(() => {
+      noteInputRef.current?.focus();
+    }, 50);
   };
 
   const { handleKeyPress, handleKeyDown } = useKeyboardInput({
@@ -62,6 +80,7 @@ export function StagingTray() {
     currentInput,
     setCurrentInput,
     onMint: handleMint,
+    onEnterFromAmount: handleFocusNote,
     soundEnabled: state.soundEnabled,
   });
 
@@ -145,7 +164,7 @@ export function StagingTray() {
         {/* Currency Selector */}
         <CurrencySelector 
           currency={currency}
-          onCurrencyChange={setCurrency}
+          onCurrencyChange={handleCurrencyChange}
         />
         <SumInput
           currency={currency}
@@ -159,6 +178,7 @@ export function StagingTray() {
             clearAll();
             setAmount('');
           }}
+          inputRef={sumInputRef}
         />
 
         {/* Arrow and USD conversion */}
@@ -183,6 +203,24 @@ export function StagingTray() {
             </motion.div>
           )}
         </div>
+      </div>
+
+      {/* Note Input Section */}
+      <div className="mb-4">
+        <input
+          ref={noteInputRef}
+          type="text"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleMint();
+            }
+          }}
+          placeholder="Add a note (optional) - e.g., 'Salary', 'Groceries', 'Coffee'"
+          className="w-full input-terminal bg-transparent border border-[var(--text-primary)] border-opacity-30 px-3 py-2 text-[var(--text-primary)] placeholder-[var(--text-primary)] placeholder-opacity-50 focus:border-opacity-100 focus:outline-none"
+          maxLength={100}
+        />
       </div>
 
       {/* Chip Display Area */}

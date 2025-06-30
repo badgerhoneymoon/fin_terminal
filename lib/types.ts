@@ -7,6 +7,7 @@ export interface Chip {
   usdRate: number;
   createdAt: Date;
   isNegative?: boolean;
+  note?: string;
 }
 
 export interface Bucket {
@@ -32,6 +33,7 @@ export interface Transaction {
   originalChipAmount?: number;
   originalChipCurrency?: Currency;
   usdRateAtTime?: number;
+  note?: string;
 }
 
 export interface ExchangeRates {
@@ -49,7 +51,7 @@ export interface BudgetState {
 }
 
 export type BudgetAction = 
-  | { type: 'MINT_CHIP'; payload: { amount: number; currency: Currency; isNegative?: boolean } }
+  | { type: 'MINT_CHIP'; payload: { amount: number; currency: Currency; isNegative?: boolean; note?: string } }
   | { type: 'DROP_CHIP'; payload: { chipId: string; bucketId: string } }
   | { type: 'REMOVE_CHIP'; payload: { chipId: string } }
   | { type: 'CLEAR_CHIPS' }

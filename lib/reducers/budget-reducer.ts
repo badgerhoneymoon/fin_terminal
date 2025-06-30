@@ -29,7 +29,7 @@ export const initialState: BudgetState = {
 export function budgetReducer(state: BudgetState, action: BudgetAction): BudgetState {
   switch (action.type) {
     case 'MINT_CHIP': {
-      const { amount, currency, isNegative } = action.payload;
+      const { amount, currency, isNegative, note } = action.payload;
       const usdRate = state.exchangeRates.rates[currency] || 1;
 
       const newChip: Chip = {
@@ -38,7 +38,8 @@ export function budgetReducer(state: BudgetState, action: BudgetAction): BudgetS
         currency,
         usdRate,
         createdAt: new Date(),
-        isNegative: isNegative || false
+        isNegative: isNegative || false,
+        note
       };
 
       return {

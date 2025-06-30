@@ -58,10 +58,10 @@ export function Chip({ chip }: ChipProps) {
       exit={{ scale: 0, rotate: 10 }}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      title={chip.currency !== 'USD' ? `≈ $${usdValue.toFixed(2)}` : undefined}
+      title={`${chip.currency !== 'USD' ? `≈ $${usdValue.toFixed(2)}` : ''}${chip.note ? `${chip.currency !== 'USD' ? '\n' : ''}Note: ${chip.note}` : ''}`}
       role="button"
       tabIndex={0}
-      aria-label={`${chip.isNegative ? 'Spending' : 'Payment'} ${currency.symbol}${chip.amount.toLocaleString()} ${chip.currency} chip`}
+      aria-label={`${chip.isNegative ? 'Spending' : 'Payment'} ${currency.symbol}${chip.amount.toLocaleString()} ${chip.currency} chip${chip.note ? ` - ${chip.note}` : ''}`}
       onKeyDown={(e) => {
         if (e.key === ' ' || e.key === 'Enter') {
           e.preventDefault();
@@ -71,19 +71,26 @@ export function Chip({ chip }: ChipProps) {
       }}
     >
       {/* Chip content */}
-      <div className="flex items-center gap-2">
-        {chip.isNegative && (
-          <span className="text-red-400 font-bold text-xs">−</span>
+      <div className="flex flex-col items-center gap-1">
+        <div className="flex items-center gap-2">
+          {chip.isNegative && (
+            <span className="text-red-400 font-bold text-xs">−</span>
+          )}
+          <span className={`${chip.isNegative ? 'text-red-400' : 'text-[var(--text-primary)]'} font-bold`}>
+            {currency.symbol}
+          </span>
+          <span className={chip.isNegative ? 'text-red-200' : 'text-white'}>
+            {chip.amount.toLocaleString()}
+          </span>
+          <span className={`${chip.isNegative ? 'text-red-400' : 'text-[var(--text-primary)]'} text-xs opacity-80`}>
+            {chip.currency}
+          </span>
+        </div>
+        {chip.note && (
+          <div className={`text-xs opacity-70 text-center max-w-[100px] truncate ${chip.isNegative ? 'text-red-300' : 'text-[var(--text-primary)]'}`}>
+            {chip.note}
+          </div>
         )}
-        <span className={`${chip.isNegative ? 'text-red-400' : 'text-[var(--text-primary)]'} font-bold`}>
-          {currency.symbol}
-        </span>
-        <span className={chip.isNegative ? 'text-red-200' : 'text-white'}>
-          {chip.amount.toLocaleString()}
-        </span>
-        <span className={`${chip.isNegative ? 'text-red-400' : 'text-[var(--text-primary)]'} text-xs opacity-80`}>
-          {chip.currency}
-        </span>
       </div>
 
       {/* Remove button */}
