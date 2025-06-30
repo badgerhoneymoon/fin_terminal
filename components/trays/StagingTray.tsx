@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBudget } from '@/lib/context/budget-context';
 import { CURRENCIES, Currency, Chip } from '@/lib/types';
@@ -19,6 +19,8 @@ export function StagingTray() {
   const [showToast, setShowToast] = useState(false);
   const [isNegative, setIsNegative] = useState(false);
   const [note, setNote] = useState('');
+  const [percentageMode, setPercentageMode] = useState(false);
+  const [percentageBase, setPercentageBase] = useState(0);
   const sumInputRef = useRef<HTMLInputElement>(null);
   const noteInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,6 +33,15 @@ export function StagingTray() {
     clearAll,
     removeNumberAt,
   } = useSumCalculator({ soundEnabled: state.soundEnabled });
+
+  // Auto-focus amount input on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      sumInputRef.current?.focus();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleMint = () => {
     let finalAmount: number;
@@ -52,6 +63,8 @@ export function StagingTray() {
     setCurrentInput('');
     setSumNumbers([]);
     setNote('');
+    setPercentageMode(false);
+    setPercentageBase(0);
     
     // Focus back to amount input for next entry
     setTimeout(() => {
@@ -77,6 +90,31 @@ export function StagingTray() {
     }, 50);
   };
 
+  const handlePercentageMode = (baseAmount: number) => {
+    setPercentageMode(true);
+    setPercentageBase(baseAmount);
+    setAmount('');
+    setCurrentInput('');
+    setSumNumbers([]);
+    if (state.soundEnabled) {
+      soundManager.playSum(); // Play a sound to indicate percentage mode
+    }
+  };
+
+  const calculatePercentage = () => {
+    if (percentageMode && amount) {
+      const percentage = parseFloat(amount);
+      if (!isNaN(percentage)) {
+        const calculatedAmount = (percentageBase * percentage / 100).toString();
+        setAmount(calculatedAmount);
+        setPercentageMode(false);
+        setPercentageBase(0);
+        return true;
+      }
+    }
+    return false;
+  };
+
   const { handleKeyPress, handleKeyDown } = useKeyboardInput({
     amount,
     setAmount,
@@ -86,6 +124,8 @@ export function StagingTray() {
     setCurrentInput,
     onMint: handleMint,
     onEnterFromAmount: handleFocusNote,
+    onPercentageMode: handlePercentageMode,
+    onCalculatePercentage: calculatePercentage,
     soundEnabled: state.soundEnabled,
   });
 
@@ -94,7 +134,10 @@ export function StagingTray() {
     // Remove any existing currency symbols and formatting (keep only digits and decimal point)
     const cleanValue = value.replace(/[^\d.]/g, '');
     
-    if (sumNumbers.length > 0) {
+    if (percentageMode) {
+      // Just store the percentage value, don't calculate yet
+      setAmount(cleanValue);
+    } else if (sumNumbers.length > 0) {
       setCurrentInput(cleanValue);
     } else {
       setAmount(cleanValue);
@@ -114,6 +157,9 @@ export function StagingTray() {
   };
 
   const getDisplayValue = () => {
+    if (percentageMode) {
+      return amount; // Show the percentage number being typed (without currency formatting)
+    }
     if (sumNumbers.length > 0) {
       return currentInput ? formatDisplayValue(currentInput, currency) : '';
     }
@@ -182,8 +228,12 @@ export function StagingTray() {
           onClearAll={() => {
             clearAll();
             setAmount('');
+            setPercentageMode(false);
+            setPercentageBase(0);
           }}
           inputRef={sumInputRef}
+          percentageMode={percentageMode}
+          percentageBase={percentageBase}
         />
 
         {/* Arrow and USD conversion */}

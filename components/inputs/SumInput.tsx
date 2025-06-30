@@ -14,6 +14,8 @@ interface SumInputProps {
   removeNumberAt: (index: number) => void;
   onClearAll: () => void;
   inputRef?: React.RefObject<HTMLInputElement>;
+  percentageMode?: boolean;
+  percentageBase?: number;
 }
 
 export function SumInput({
@@ -26,6 +28,8 @@ export function SumInput({
   removeNumberAt,
   onClearAll,
   inputRef: externalInputRef,
+  percentageMode = false,
+  percentageBase = 0,
 }: SumInputProps) {
   const internalInputRef = useRef<HTMLInputElement>(null);
   const inputRef = externalInputRef || internalInputRef;
@@ -50,8 +54,19 @@ export function SumInput({
           </div>
         ))}
         
+        {/* Percentage mode indicator */}
+        {percentageMode && (
+          <div className="flex items-center gap-2">
+            <span className="text-[var(--text-accent)] font-bold text-sm">
+              {CURRENCIES[currency].symbol}{formatSmartAmount(percentageBase, currency)}
+            </span>
+            <span className="text-[var(--text-accent)] opacity-80 text-sm font-mono">×</span>
+            <span className="text-[var(--text-accent)] font-bold text-sm">%</span>
+          </div>
+        )}
+        
         {/* Plus sign between chips and input */}
-        {sumNumbers.length > 0 && (
+        {sumNumbers.length > 0 && !percentageMode && (
           <span className="text-[var(--text-primary)] opacity-60 text-sm font-mono">+</span>
         )}
         
@@ -63,7 +78,13 @@ export function SumInput({
           onChange={handleAmountChange}
           onKeyPress={handleKeyPress}
           onKeyDown={handleKeyDown}
-          placeholder={sumNumbers.length > 0 ? "Add more..." : `Amount (${CURRENCIES[currency].symbol}) - Press SPACE to sum`}
+          placeholder={
+            percentageMode 
+              ? "Enter percentage (e.g., 5 for 5%)" 
+              : sumNumbers.length > 0 
+                ? "Add more..." 
+                : `Amount (${CURRENCIES[currency].symbol}) - Press SPACE to sum, % for percentage`
+          }
           className="flex-1 bg-transparent border-none outline-none text-white placeholder-[var(--text-primary)] placeholder-opacity-50 min-w-[120px]"
           aria-label="Chip amount"
         />

@@ -14,6 +14,8 @@ interface UseKeyboardInputOptions {
   // Actions
   onMint: () => void;
   onEnterFromAmount?: () => void;
+  onPercentageMode?: (baseAmount: number) => void;
+  onCalculatePercentage?: () => boolean;
   
   // Settings
   soundEnabled?: boolean;
@@ -29,11 +31,22 @@ export function useKeyboardInput(options: UseKeyboardInputOptions) {
     setCurrentInput,
     onMint,
     onEnterFromAmount,
+    onPercentageMode,
+    onCalculatePercentage,
     soundEnabled = false,
   } = options;
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      // First check if we're in percentage mode
+      if (onCalculatePercentage && onCalculatePercentage()) {
+        // Percentage was calculated, focus note field
+        if (onEnterFromAmount) {
+          onEnterFromAmount();
+        }
+        return;
+      }
+      
       // Check if there's an amount to process
       const currentNum = parseFloat(currentInput) || 0;
       const totalSum = sumNumbers.reduce((sum, num) => sum + num, 0) + currentNum;
@@ -48,6 +61,19 @@ export function useKeyboardInput(options: UseKeyboardInputOptions) {
       } else {
         // No amount, so just mint (this handles the case from note field)
         onMint();
+      }
+    } else if (e.key === '%' && onPercentageMode) {
+      e.preventDefault();
+      
+      // Calculate base amount for percentage
+      const currentNum = parseFloat(currentInput) || 0;
+      const totalSum = sumNumbers.reduce((sum, num) => sum + num, 0) + currentNum;
+      const singleAmount = parseFloat(amount) || 0;
+      
+      const baseAmount = sumNumbers.length > 0 ? totalSum : singleAmount;
+      
+      if (baseAmount > 0) {
+        onPercentageMode(baseAmount);
       }
     } else if (e.key === ' ') {
       e.preventDefault();
