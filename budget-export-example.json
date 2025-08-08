@@ -1,0 +1,63 @@
+{
+  "buckets": [
+    {
+      "id": "stabilisation-fund",
+      "name": "STABILISATION FUND",
+      "type": "fund",
+      "current": 0,
+      "target": 1500,
+      "currency": "USD",
+      "completedMilestones": []
+    },
+    {
+      "id": "tinkoff-card",
+      "name": "TINKOFF CARD",
+      "type": "debt",
+      "current": 0,
+      "target": 0,
+      "currency": "RUB",
+      "creditLimit": 474000,
+      "completedMilestones": []
+    },
+    {
+      "id": "boa-card",
+      "name": "BOA CARD",
+      "type": "debt",
+      "current": 0,
+      "target": 0,
+      "currency": "USD",
+      "creditLimit": 2600,
+      "completedMilestones": []
+    },
+    {
+      "id": "uk-global-visa",
+      "name": "UK GLOBAL VISA",
+      "type": "fund",
+      "current": 0,
+      "target": 3500,
+      "currency": "GBP",
+      "milestones": [
+        1750,
+        2625
+      ],
+      "completedMilestones": []
+    }
+  ],
+  "chips": [],
+  "transactions": [],
+  "exchangeRates": {
+    "rates": {
+      "USD": 1,
+      "EUR": 1.1692478553597374,
+      "GBP": 1.3532412075588371,
+      "RUB": 0.012820920966313244,
+      "IDR": 0.0000616522940487711,
+      "VND": 0.00003829503231861647,
+      "BTC": 117401.20688440677,
+      "USDT": 1.000511421418172
+    },
+    "lastUpdated": "2025-07-13T08:28:27.945Z",
+    "status": "success"
+  },
+  "soundEnabled": false
+}

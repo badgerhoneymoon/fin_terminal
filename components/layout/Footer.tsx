@@ -1,12 +1,11 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBudget } from '@/lib/context/budget-context';
 
 export function Footer() {
   const { state, exportData, importData } = useBudget();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [lastSaveTime, setLastSaveTime] = useState<Date>(new Date());
   const [importError, setImportError] = useState<string | null>(null);
 
@@ -15,31 +14,37 @@ export function Footer() {
     setLastSaveTime(new Date());
   }, [state]);
 
-  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      importData(text);
-      setImportError(null);
-      
-      // Clear the input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    } catch {
-      setImportError('Invalid JSON file format');
-      setTimeout(() => setImportError(null), 3000);
-    }
-  };
 
   const handleExport = () => {
     exportData();
   };
 
   const handleImportClick = () => {
-    fileInputRef.current?.click();
+    console.log('Import button clicked!');
+    // Create a fresh file input element to avoid state issues
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = async (event) => {
+      console.log('File selected');
+      const target = event.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        console.log('File read successfully, importing data');
+        importData(text);
+        setImportError(null);
+      } catch (error) {
+        console.error('Import error:', error);
+        setImportError('Invalid JSON file format');
+        setTimeout(() => setImportError(null), 3000);
+      }
+    };
+    console.log('About to trigger file input click');
+    input.click();
+    console.log('File input click triggered');
   };
 
   const formatTimeAgo = (date: Date) => {
@@ -80,15 +85,6 @@ export function Footer() {
           [Import]
         </button>
         
-        {/* Hidden file input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json,application/json"
-          onChange={handleImport}
-          className="hidden"
-          aria-label="Import JSON file"
-        />
       </div>
 
       {/* Center - Separator */}

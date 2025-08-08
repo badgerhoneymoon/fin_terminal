@@ -18,7 +18,7 @@ export function Header({ layoutMode = 'compact', onLayoutModeChange }: HeaderPro
   const [showCaret, setShowCaret] = useState(true);
   const [hasTyped, setHasTyped] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
-  const fullText = '█ BUDGET DROP';
+  const fullText = 'BUDGET DROP';
 
   // Check if typing animation has run in this session
   useEffect(() => {
