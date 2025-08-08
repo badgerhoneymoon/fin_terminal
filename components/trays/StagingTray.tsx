@@ -27,11 +27,15 @@ export function StagingTray() {
   const {
     sumNumbers,
     setSumNumbers,
+    sumEntries,
+    setSumEntries,
+    nextOperation,
+    setNextOperation,
     currentInput,
     setCurrentInput,
     calculateSum,
     clearAll,
-    removeNumberAt,
+    removeEntryAt,
   } = useSumCalculator({ soundEnabled: state.soundEnabled });
 
   // Auto-focus amount input on mount
@@ -120,6 +124,10 @@ export function StagingTray() {
     setAmount,
     sumNumbers,
     setSumNumbers,
+    sumEntries,
+    setSumEntries,
+    nextOperation,
+    setNextOperation,
     currentInput,
     setCurrentInput,
     onMint: handleMint,
@@ -220,11 +228,13 @@ export function StagingTray() {
         <SumInput
           currency={currency}
           sumNumbers={sumNumbers}
+          sumEntries={sumEntries}
+          nextOperation={nextOperation}
           getDisplayValue={getDisplayValue}
           handleAmountChange={handleAmountChange}
           handleKeyPress={handleKeyPress}
           handleKeyDown={handleKeyDown}
-          removeNumberAt={removeNumberAt}
+          removeNumberAt={removeEntryAt}
           onClearAll={() => {
             clearAll();
             setAmount('');

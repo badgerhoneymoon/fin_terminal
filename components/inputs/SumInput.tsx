@@ -3,10 +3,13 @@
 import { useRef } from 'react';
 import { CURRENCIES, Currency } from '@/lib/types';
 import { formatSmartAmount } from '@/lib/utils';
+import { CalculatorEntry } from '@/hooks/input/useSumCalculator';
 
 interface SumInputProps {
   currency: Currency;
   sumNumbers: number[];
+  sumEntries?: CalculatorEntry[];
+  nextOperation?: '+' | '-';
   getDisplayValue: () => string;
   handleAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyPress: (e: React.KeyboardEvent) => void;
@@ -21,6 +24,8 @@ interface SumInputProps {
 export function SumInput({
   currency,
   sumNumbers,
+  sumEntries,
+  nextOperation = '+',
   getDisplayValue,
   handleAmountChange,
   handleKeyPress,
@@ -37,8 +42,29 @@ export function SumInput({
   return (
     <div className="flex-1 relative">
       <div className="relative w-full input-terminal flex items-center gap-2 flex-wrap min-h-[44px] py-2">
-        {/* Number chips */}
-        {sumNumbers.map((num, index) => (
+        {/* Number chips with operations */}
+        {sumEntries ? sumEntries.map((entry, index) => (
+          <>
+            {index > 0 && (
+              <span className={`text-sm font-mono ${entry.operation === '-' ? 'text-red-400' : 'text-[var(--text-primary)] opacity-60'}`}>
+                {entry.operation}
+              </span>
+            )}
+            <div
+              key={index}
+              className="inline-flex items-center gap-1 px-2 py-1 bg-black/40 text-[var(--text-primary)] rounded border border-[var(--text-primary)] border-opacity-30 text-sm font-mono"
+            >
+              <span>{CURRENCIES[currency].symbol}{formatSmartAmount(entry.value, currency)}</span>
+              <button
+                onClick={() => removeNumberAt(index)}
+                className="text-[var(--text-primary)] opacity-60 hover:opacity-100 hover:text-red-400 text-xs ml-1 transition-colors"
+                title="Remove this number"
+              >
+                ×
+              </button>
+            </div>
+          </>
+        )) : sumNumbers.map((num, index) => (
           <div
             key={index}
             className="inline-flex items-center gap-1 px-2 py-1 bg-black/40 text-[var(--text-primary)] rounded border border-[var(--text-primary)] border-opacity-30 text-sm font-mono"
@@ -65,9 +91,11 @@ export function SumInput({
           </div>
         )}
         
-        {/* Plus sign between chips and input */}
+        {/* Operation sign between chips and input */}
         {sumNumbers.length > 0 && !percentageMode && (
-          <span className="text-[var(--text-primary)] opacity-60 text-sm font-mono">+</span>
+          <span className={`text-sm font-mono ${nextOperation === '-' ? 'text-red-400' : 'text-[var(--text-primary)] opacity-60'}`}>
+            {nextOperation}
+          </span>
         )}
         
         {/* Input field */}
@@ -83,7 +111,7 @@ export function SumInput({
               ? "Enter percentage (e.g., 5 for 5%)" 
               : sumNumbers.length > 0 
                 ? "Add more..." 
-                : `Amount (${CURRENCIES[currency].symbol}) - Press SPACE to sum, % for percentage`
+                : `Amount (${CURRENCIES[currency].symbol}) - SPACE to add, - to subtract, % for percentage`
           }
           className="flex-1 bg-transparent border-none outline-none text-white placeholder-[var(--text-primary)] placeholder-opacity-50 min-w-[120px]"
           aria-label="Chip amount"

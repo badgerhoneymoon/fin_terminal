@@ -1,4 +1,5 @@
 import { soundManager } from '@/lib/sound/sounds';
+import { CalculatorEntry } from './useSumCalculator';
 
 interface UseKeyboardInputOptions {
   // Main amount state
@@ -8,6 +9,10 @@ interface UseKeyboardInputOptions {
   // Sum calculator integration
   sumNumbers: number[];
   setSumNumbers: (value: number[] | ((prev: number[]) => number[])) => void;
+  sumEntries?: CalculatorEntry[];
+  setSumEntries?: (value: CalculatorEntry[] | ((prev: CalculatorEntry[]) => CalculatorEntry[])) => void;
+  nextOperation?: '+' | '-';
+  setNextOperation?: (op: '+' | '-') => void;
   currentInput: string;
   setCurrentInput: (value: string) => void;
   
@@ -27,6 +32,10 @@ export function useKeyboardInput(options: UseKeyboardInputOptions) {
     setAmount,
     sumNumbers,
     setSumNumbers,
+    sumEntries,
+    setSumEntries,
+    nextOperation = '+',
+    setNextOperation,
     currentInput,
     setCurrentInput,
     onMint,
@@ -75,8 +84,11 @@ export function useKeyboardInput(options: UseKeyboardInputOptions) {
       if (baseAmount > 0) {
         onPercentageMode(baseAmount);
       }
-    } else if (e.key === ' ') {
+    } else if (e.key === ' ' || e.key === '-') {
       e.preventDefault();
+      
+      // Set the operation for the next number
+      const operation = e.key === '-' ? '-' : '+';
       
       // Add current number to the sum
       let currentNum: number;
@@ -86,7 +98,11 @@ export function useKeyboardInput(options: UseKeyboardInputOptions) {
         // First number - check amount
         currentNum = parseFloat(amount);
         if (!isNaN(currentNum) && currentNum > 0) {
-          setSumNumbers([currentNum]);
+          if (setSumEntries) {
+            setSumEntries([{ value: currentNum, operation: '+' }]);
+          } else {
+            setSumNumbers([currentNum]);
+          }
           setAmount('');
           numberAdded = true;
         }
@@ -94,10 +110,19 @@ export function useKeyboardInput(options: UseKeyboardInputOptions) {
         // Subsequent numbers - check currentInput
         currentNum = parseFloat(currentInput);
         if (!isNaN(currentNum) && currentNum > 0) {
-          setSumNumbers(prev => [...prev, currentNum]);
+          if (setSumEntries) {
+            setSumEntries(prev => [...prev, { value: currentNum, operation: nextOperation }]);
+          } else {
+            setSumNumbers(prev => [...prev, currentNum]);
+          }
           setCurrentInput('');
           numberAdded = true;
         }
+      }
+      
+      // Set the operation for the next input
+      if (setNextOperation && numberAdded) {
+        setNextOperation(operation);
       }
       
       // Play sum sound if a number was successfully added
