@@ -111,12 +111,12 @@ export const DEFAULT_BUCKETS: Bucket[] = [
   },
   {
     id: 'uk-global-visa',
-    name: 'UK GLOBAL VISA',
+    name: 'VISA FEES',
     type: 'fund',
     current: 0,
-    target: 3500,
-    currency: 'GBP',
-    milestones: [1750, 2625],
+    target: 7000,
+    currency: 'USD',
+    milestones: [3500, 5250],
     completedMilestones: []
   }
 ]; 

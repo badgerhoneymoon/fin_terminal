@@ -12,6 +12,18 @@ const migrateState = (state: BudgetState): BudgetState => {
         return { ...bucket, creditLimit: defaultBucket.creditLimit };
       }
     }
+    
+    // Migrate UK GLOBAL VISA to VISA FEES with new target and currency
+    if (bucket.id === 'uk-global-visa' && bucket.name === 'UK GLOBAL VISA') {
+      return { 
+        ...bucket, 
+        name: 'VISA FEES',
+        target: 7000,
+        currency: 'USD',
+        milestones: [3500, 5250]
+      };
+    }
+    
     return bucket;
   });
 
