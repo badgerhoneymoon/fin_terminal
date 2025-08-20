@@ -108,6 +108,7 @@ export function Bucket({ bucket, activeChip }: BucketProps) {
         bucket={bucket}
         recentTransactions={recentTransactions}
         progress={progress}
+        exchangeRates={state.exchangeRates.rates}
         onShowTransactionHistory={() => setShowTransactionHistory(true)}
         onShowTransactionChart={() => setShowTransactionChart(true)}
       >

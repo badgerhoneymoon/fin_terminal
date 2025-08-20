@@ -1,7 +1,7 @@
 'use client';
 
 import { Bucket as BucketType, CURRENCIES } from '@/lib/types';
-import { formatSmartAmount } from '@/lib/utils';
+import { formatSmartAmount, calculateCurrentFromHoldings } from '@/lib/utils';
 import { BarChart3 } from 'lucide-react';
 
 interface BucketHeaderProps {
@@ -11,6 +11,7 @@ interface BucketHeaderProps {
   onShowTransactionHistory: () => void;
   onShowTransactionChart: () => void;
   children?: React.ReactNode; // for menu injection
+  exchangeRates: { [key: string]: number };
 }
 
 export function BucketHeader({ 
@@ -19,9 +20,15 @@ export function BucketHeader({
   progress, 
   onShowTransactionHistory,
   onShowTransactionChart,
-  children 
+  children,
+  exchangeRates
 }: BucketHeaderProps) {
   const currency = CURRENCIES[bucket.currency];
+  
+  // For fund buckets, calculate current from holdings; for debt buckets, use bucket.current
+  const actualCurrent = bucket.type === 'fund' 
+    ? calculateCurrentFromHoldings(bucket.holdings, exchangeRates) / (exchangeRates[bucket.currency] || 1)
+    : bucket.current;
 
   return (
     <div className="flex items-center justify-between mb-3">
@@ -34,7 +41,7 @@ export function BucketHeader({
           {bucket.type === 'debt' ? (
             <>
               <span className="text-xl font-bold text-white">
-                {currency.symbol}{formatSmartAmount(bucket.current, bucket.currency)}
+                {currency.symbol}{formatSmartAmount(actualCurrent, bucket.currency)}
               </span>
               <span className="text-[var(--text-primary)] mx-2">owed</span>
               <span className="text-[var(--text-primary)] opacity-50">•</span>
@@ -45,7 +52,7 @@ export function BucketHeader({
           ) : (
             <>
               <span className="text-xl font-bold text-white">
-                {currency.symbol}{formatSmartAmount(bucket.current, bucket.currency)}
+                {currency.symbol}{formatSmartAmount(actualCurrent, bucket.currency)}
               </span>
               <span className="text-[var(--text-primary)]">
                 / {currency.symbol}{formatSmartAmount(bucket.target, bucket.currency)}
