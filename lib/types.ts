@@ -79,6 +79,34 @@ export const CURRENCIES: { [key in Currency]: { symbol: string; name: string } }
   EUR: { symbol: '€', name: 'Euro' }
 };
 
+// Habit Tracker Types
+export interface Habit {
+  id: string;
+  name: string;
+  description?: string;
+  weekStart: Date; // Monday of the week this habit is for
+  completions: boolean[]; // Array of 7 booleans (Mon-Sun)
+  target: number; // How many days needed for success (default 6)
+  createdAt: Date;
+}
+
+export interface HabitState {
+  habits: Habit[];
+  currentWeekStart: Date;
+  soundEnabled: boolean;
+}
+
+export type HabitAction = 
+  | { type: 'CREATE_HABIT'; payload: { name: string; description?: string; target?: number } }
+  | { type: 'TOGGLE_COMPLETION'; payload: { habitId: string; dayIndex: number } }
+  | { type: 'DELETE_HABIT'; payload: { habitId: string } }
+  | { type: 'SET_WEEK'; payload: { weekStart: Date } }
+  | { type: 'TOGGLE_SOUND' }
+  | { type: 'IMPORT_DATA'; payload: HabitState }
+  | { type: 'RESET_STATE' };
+
+export const DAYS_OF_WEEK = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as const;
+
 export const DEFAULT_BUCKETS: Bucket[] = [
   {
     id: 'stabilisation-fund',

@@ -256,6 +256,17 @@ export function Header({ layoutMode = 'compact', onLayoutModeChange }: HeaderPro
                   className="absolute right-0 mt-2 w-48 glass-panel border border-[var(--text-primary)] z-50"
                 >
                   <div className="p-2 space-y-1">
+                    {/* Habits Link */}
+                    <div className="px-3 py-2">
+                      <a
+                        href="/habits"
+                        onClick={() => setShowSettingsDropdown(false)}
+                        className="w-full text-left text-xs hover:bg-[var(--text-primary)]/20 hover:text-[var(--text-primary)] transition-colors py-1 text-[var(--text-primary)] opacity-70 hover:opacity-100 block"
+                      >
+                        🎯 Habit Terminal
+                      </a>
+                    </div>
+                    
                     {/* Reset Button */}
                     <div className="px-3 py-2">
                       <button

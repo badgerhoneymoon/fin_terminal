@@ -14,15 +14,20 @@ npm install
 
 # Development
 npm run dev          # Start development server (http://localhost:3000)
+PORT=3001 npm run dev # Start on different port
 npm run build        # Build for production
 npm run start        # Start production server
 
 # Quality Assurance
 npm run lint         # Run ESLint
+npx tsc --noEmit     # Run TypeScript type checking
 npm test            # Run Jest tests
+jest --testNamePattern="specific test" # Run single test
 ```
 
-**Note**: The developer typically runs `npm run dev` automatically, so no need to suggest this command unless specifically asked.
+**Note**: The developer handles running the dev server themselves - do NOT suggest running `npm run dev` unless explicitly asked.
+
+**Data Persistence**: App state persists in browser localStorage under key `budgetdrop.v1` at localhost:3000. Can be exported/imported via JSON files.
 
 ## Architecture & Stack
 
@@ -74,10 +79,19 @@ npm test            # Run Jest tests
 The application uses a centralized BudgetContext with reducer pattern:
 
 - **BudgetContext** (`/lib/context/budget-context.tsx`): Main state provider
-- **BudgetReducer** (`/lib/reducers/budget-reducer.ts`): Core business logic
+- **BudgetReducer** (`/lib/reducers/budget-reducer.ts`): Core business logic  
 - **Types** (`/lib/types.ts`): TypeScript definitions for all entities
+- **Storage Service** (`/lib/services/storage.ts`): localStorage persistence with migration support
 
 Key actions: `mint`, `drop`, `undo`, `import`, `export`, `updateRates`
+
+### Critical Data Flow Patterns
+
+1. **Fund Buckets**: Use `holdings` object to track multi-currency amounts, calculate totals via `calculateCurrentFromHoldings()`
+2. **Debt Buckets**: Use `bucket.current` directly for single-currency debt amounts  
+3. **Holdings vs Current**: Fund bucket totals must be calculated from holdings to match display - never use `bucket.current` directly for funds
+4. **Migration System**: Storage service automatically migrates existing user data without data loss via `migrateState()`
+5. **Exchange Rate Conversion**: All amounts converted through USD as base currency using `exchangeRates.rates`
 
 ## Design System
 
@@ -123,6 +137,17 @@ Key actions: `mint`, `drop`, `undo`, `import`, `export`, `updateRates`
 - **Persistence**: localStorage with JSON serialization
 - **Export/Import**: JSON file download/upload functionality
 - **Undo System**: Right-click bucket for transaction history (last 20 moves)
+
+## Code Quality Requirements
+
+**CRITICAL**: ALWAYS run these commands after every code edit to ensure code quality:
+
+```bash
+npm run lint         # Must pass - no ESLint errors allowed
+npx tsc --noEmit     # Must pass - no TypeScript errors allowed  
+```
+
+**Enforcement**: Code changes that introduce linting or TypeScript errors are not acceptable and must be fixed immediately.
 
 ## Accessibility Features
 

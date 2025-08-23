@@ -1,4 +1,4 @@
-import { BudgetState, DEFAULT_BUCKETS } from '../types';
+import { BudgetState, DEFAULT_BUCKETS, Currency } from '../types';
 
 const STORAGE_KEY = 'budgetdrop.v1';
 
@@ -19,7 +19,7 @@ const migrateState = (state: BudgetState): BudgetState => {
         ...bucket, 
         name: 'VISA FEES',
         target: 7000,
-        currency: 'USD',
+        currency: 'USD' as Currency,
         milestones: [3500, 5250]
       };
     }
