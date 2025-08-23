@@ -53,13 +53,15 @@ export function BudgetDrop() {
       >
         <div className="flex flex-col min-h-screen">
           {/* Header */}
-          <Header 
-            layoutMode={layoutMode}
-            onLayoutModeChange={setLayoutMode}
-          />
+          <div className="sticky top-0 z-40 bg-[var(--bg-terminal)]">
+            <Header 
+              layoutMode={layoutMode}
+              onLayoutModeChange={setLayoutMode}
+            />
+          </div>
 
           {/* Main Content */}
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-6 pb-20">
             <div className="max-w-6xl mx-auto space-y-6">
               {/* Staging Tray - moved to top */}
               <motion.section
@@ -105,7 +107,9 @@ export function BudgetDrop() {
           </main>
 
           {/* Footer */}
-          <Footer />
+          <div className="sticky bottom-0 z-40 bg-[var(--bg-terminal)]">
+            <Footer />
+          </div>
         </div>
 
         {/* Drag Overlay */}

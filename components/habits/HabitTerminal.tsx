@@ -64,7 +64,7 @@ export function HabitTerminal() {
     <div className="min-h-screen bg-[var(--bg-terminal)] crt-scanlines">
       <div className="flex flex-col min-h-screen">
         {/* Header */}
-        <div className="border-b border-[var(--text-primary)] bg-[var(--bg-terminal)]">
+        <div className="sticky top-0 z-40 border-b border-[var(--text-primary)] bg-[var(--bg-terminal)]">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -138,7 +138,7 @@ export function HabitTerminal() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+        <div className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 pb-20">
           <div className="grid gap-8">
             
             {/* Focus Selector - Create new habits */}
@@ -197,7 +197,7 @@ export function HabitTerminal() {
         </div>
 
         {/* Footer - Habit Terminal specific */}
-        <footer className="border-t border-[var(--text-primary)] bg-[var(--bg-terminal)] p-4">
+        <footer className="sticky bottom-0 z-40 border-t border-[var(--text-primary)] bg-[var(--bg-terminal)] p-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Left side - Import/Export */}
             <div className="flex items-center gap-4">
