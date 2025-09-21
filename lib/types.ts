@@ -56,6 +56,8 @@ export type BudgetAction =
   | { type: 'REMOVE_CHIP'; payload: { chipId: string } }
   | { type: 'CLEAR_CHIPS' }
   | { type: 'RESET_BUCKET'; payload: { bucketId: string } }
+  | { type: 'ADD_BUCKET'; payload: { name: string; type: 'fund' | 'debt'; target: number; currency: Currency; creditLimit?: number; milestones?: number[] } }
+  | { type: 'DELETE_BUCKET'; payload: { bucketId: string } }
 
   | { type: 'DELETE_TRANSACTION'; payload: { transactionId: string } }
   | { type: 'UPDATE_TRANSACTION'; payload: { transactionId: string; newAmount: number } }
@@ -145,6 +147,16 @@ export const DEFAULT_BUCKETS: Bucket[] = [
     target: 7000,
     currency: 'USD',
     milestones: [3500, 5250],
+    completedMilestones: []
+  },
+  {
+    id: 'm4-max',
+    name: 'M4 MAX',
+    type: 'fund',
+    current: 0,
+    target: 4000,
+    currency: 'USD',
+    milestones: [1000, 2000, 3000],
     completedMilestones: []
   }
 ]; 

@@ -83,6 +83,38 @@ export function budgetReducer(state: BudgetState, action: BudgetAction): BudgetS
       };
     }
 
+    case 'ADD_BUCKET': {
+      const { name, type, target, currency, creditLimit, milestones } = action.payload;
+
+      const newBucket = {
+        id: `bucket-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name,
+        type,
+        current: 0,
+        target,
+        currency,
+        creditLimit,
+        milestones: milestones || [],
+        completedMilestones: [],
+        holdings: type === 'fund' ? {} : undefined
+      };
+
+      return {
+        ...state,
+        buckets: [...state.buckets, newBucket]
+      };
+    }
+
+    case 'DELETE_BUCKET': {
+      const { bucketId } = action.payload;
+
+      return {
+        ...state,
+        buckets: state.buckets.filter(b => b.id !== bucketId),
+        transactions: state.transactions.filter(t => t.bucketId !== bucketId)
+      };
+    }
+
     case 'DELETE_TRANSACTION': {
       return handleDeleteTransaction(state, action.payload);
     }

@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBudget } from '@/lib/context/budget-context';
 import { useState, useEffect } from 'react';
+import { AddBucketModal } from '@/components/budget/AddBucketModal';
 
 interface HeaderProps {
   layoutMode?: 'individual' | 'compact';
@@ -148,6 +149,9 @@ export function Header({ layoutMode = 'compact', onLayoutModeChange }: HeaderPro
 
       {/* Right side - Controls */}
       <div className="flex items-center gap-3">
+        {/* Add Bucket Button */}
+        <AddBucketModal />
+
         {/* Layout Toggle */}
         {onLayoutModeChange && (
           <div className="flex border border-[var(--text-primary)] text-xs h-10">
