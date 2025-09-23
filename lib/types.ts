@@ -50,7 +50,7 @@ export interface BudgetState {
   soundEnabled: boolean;
 }
 
-export type BudgetAction = 
+export type BudgetAction =
   | { type: 'MINT_CHIP'; payload: { amount: number; currency: Currency; isNegative?: boolean; note?: string } }
   | { type: 'DROP_CHIP'; payload: { chipId: string; bucketId: string } }
   | { type: 'REMOVE_CHIP'; payload: { chipId: string } }
@@ -58,6 +58,7 @@ export type BudgetAction =
   | { type: 'RESET_BUCKET'; payload: { bucketId: string } }
   | { type: 'ADD_BUCKET'; payload: { name: string; type: 'fund' | 'debt'; target: number; currency: Currency; creditLimit?: number; milestones?: number[] } }
   | { type: 'DELETE_BUCKET'; payload: { bucketId: string } }
+  | { type: 'UPDATE_BUCKET_TARGET'; payload: { bucketId: string; target: number; creditLimit?: number } }
 
   | { type: 'DELETE_TRANSACTION'; payload: { transactionId: string } }
   | { type: 'UPDATE_TRANSACTION'; payload: { transactionId: string; newAmount: number } }

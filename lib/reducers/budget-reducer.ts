@@ -115,6 +115,23 @@ export function budgetReducer(state: BudgetState, action: BudgetAction): BudgetS
       };
     }
 
+    case 'UPDATE_BUCKET_TARGET': {
+      const { bucketId, target, creditLimit } = action.payload;
+
+      return {
+        ...state,
+        buckets: state.buckets.map(bucket =>
+          bucket.id === bucketId
+            ? {
+                ...bucket,
+                target,
+                ...(bucket.type === 'debt' && creditLimit !== undefined && { creditLimit })
+              }
+            : bucket
+        )
+      };
+    }
+
     case 'DELETE_TRANSACTION': {
       return handleDeleteTransaction(state, action.payload);
     }
