@@ -28,8 +28,8 @@ export function Bucket({ bucket, activeChip }: BucketProps) {
   const [showTransactionChart, setShowTransactionChart] = useState(false);
   
   // Check if the current drag is valid for this bucket
-  const isValidDropTarget = !activeChip || 
-    (activeChip.isNegative ? bucket.type === 'debt' : true);
+  // Allow all chips on all buckets - both positive and negative
+  const isValidDropTarget = true;
   
   const {
     isOver,
