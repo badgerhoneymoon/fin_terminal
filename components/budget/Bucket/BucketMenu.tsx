@@ -122,7 +122,7 @@ export function BucketMenu({ bucketId, onReset }: BucketMenuProps) {
                   </div>
                 )}
 
-                {/* Reset Button */}
+                {/* Clear Button */}
                 <div className="px-3 py-2 border-t border-[var(--text-primary)]/30">
                   <button
                     onClick={() => {
@@ -131,7 +131,7 @@ export function BucketMenu({ bucketId, onReset }: BucketMenuProps) {
                     }}
                     className="w-full text-left text-xs hover:bg-yellow-600/20 hover:text-yellow-400 transition-colors py-1 text-[var(--text-primary)]"
                   >
-                    Reset to Default
+                    Clear to Zero
                   </button>
                 </div>
               </div>

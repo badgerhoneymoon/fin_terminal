@@ -69,14 +69,18 @@ export function budgetReducer(state: BudgetState, action: BudgetAction): BudgetS
 
     case 'RESET_BUCKET': {
       const { bucketId } = action.payload;
-      const defaultBucket = DEFAULT_BUCKETS.find(b => b.id === bucketId);
-
-      if (!defaultBucket) return state;
 
       return {
         ...state,
         buckets: state.buckets.map(b =>
-          b.id === bucketId ? { ...defaultBucket } : b
+          b.id === bucketId
+            ? {
+                ...b,
+                current: 0,
+                completedMilestones: [],
+                holdings: b.type === 'fund' ? {} : undefined
+              }
+            : b
         ),
         // Remove transactions related to this bucket
         transactions: state.transactions.filter(t => t.bucketId !== bucketId)
