@@ -58,6 +58,7 @@ export type BudgetAction =
   | { type: 'RESET_BUCKET'; payload: { bucketId: string } }
   | { type: 'ADD_BUCKET'; payload: { name: string; type: 'fund' | 'debt'; target: number; currency: Currency; creditLimit?: number; milestones?: number[] } }
   | { type: 'DELETE_BUCKET'; payload: { bucketId: string } }
+  | { type: 'RENAME_BUCKET'; payload: { bucketId: string; name: string } }
   | { type: 'UPDATE_BUCKET_TARGET'; payload: { bucketId: string; target: number; creditLimit?: number } }
 
   | { type: 'DELETE_TRANSACTION'; payload: { transactionId: string } }

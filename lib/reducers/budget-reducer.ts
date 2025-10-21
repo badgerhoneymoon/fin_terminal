@@ -115,6 +115,19 @@ export function budgetReducer(state: BudgetState, action: BudgetAction): BudgetS
       };
     }
 
+    case 'RENAME_BUCKET': {
+      const { bucketId, name } = action.payload;
+
+      return {
+        ...state,
+        buckets: state.buckets.map(bucket =>
+          bucket.id === bucketId
+            ? { ...bucket, name }
+            : bucket
+        )
+      };
+    }
+
     case 'UPDATE_BUCKET_TARGET': {
       const { bucketId, target, creditLimit } = action.payload;
 

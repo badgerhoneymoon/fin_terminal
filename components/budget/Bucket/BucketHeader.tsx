@@ -26,9 +26,11 @@ export function BucketHeader({
   exchangeRates
 }: BucketHeaderProps) {
   const currency = CURRENCIES[bucket.currency];
-  const { dispatch } = useBudget();
+  const { dispatch, renameBucket } = useBudget();
   const [isEditingTarget, setIsEditingTarget] = useState(false);
   const [editedTarget, setEditedTarget] = useState(0);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState('');
 
   const handleSave = () => {
     if (bucket.type === 'debt') {
@@ -70,6 +72,32 @@ export function BucketHeader({
       handleCancel();
     }
   };
+
+  const startEditingName = () => {
+    setEditedName(bucket.name);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = () => {
+    if (editedName.trim()) {
+      renameBucket(bucket.id, editedName.trim());
+      setIsEditingName(false);
+    }
+  };
+
+  const handleCancelName = () => {
+    setIsEditingName(false);
+  };
+
+  const handleKeyDownName = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveName();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancelName();
+    }
+  };
   
   // For fund buckets, calculate current from holdings; for debt buckets, use bucket.current
   const actualCurrent = bucket.type === 'fund' 
@@ -79,9 +107,41 @@ export function BucketHeader({
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-3 flex-1">
-        <span className="text-white font-bold text-lg uppercase">
-          ▌ {bucket.name}
-        </span>
+        {isEditingName ? (
+          <div className="flex items-center gap-2">
+            <span className="text-white font-bold text-lg">▌</span>
+            <input
+              type="text"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onKeyDown={handleKeyDownName}
+              className="bg-black/60 text-white font-bold text-lg uppercase px-2 py-1 border border-[var(--text-primary)] rounded"
+              autoFocus
+            />
+            <button
+              onClick={handleSaveName}
+              className="text-green-500 hover:text-green-400"
+              title="Save (Enter)"
+            >
+              <Check size={16} />
+            </button>
+            <button
+              onClick={handleCancelName}
+              className="text-red-500 hover:text-red-400"
+              title="Cancel (Esc)"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={startEditingName}
+            className="text-white font-bold text-lg uppercase hover:text-[var(--text-accent)] transition-colors group flex items-center gap-1"
+          >
+            <span>▌ {bucket.name}</span>
+            <Pencil size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        )}
         <span className="text-[var(--text-primary)] opacity-50">•</span>
         <div className="flex items-center gap-2">
           {bucket.type === 'debt' ? (

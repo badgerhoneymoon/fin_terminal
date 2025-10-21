@@ -16,6 +16,8 @@ interface BudgetContextType {
   removeChip: (chipId: string) => void;
   clearChips: () => void;
   resetBucket: (bucketId: string) => void;
+  deleteBucket: (bucketId: string) => void;
+  renameBucket: (bucketId: string, name: string) => void;
   deleteTransaction: (transactionId: string) => void;
   updateTransaction: (transactionId: string, newAmount: number) => void;
   convertChipPolarity: (chipId: string, isNegative: boolean) => void;
@@ -50,6 +52,8 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     removeChip,
     clearChips,
     resetBucket,
+    deleteBucket,
+    renameBucket,
     deleteTransaction,
     updateTransaction,
     convertChipPolarity,
@@ -67,6 +71,8 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     removeChip,
     clearChips,
     resetBucket,
+    deleteBucket,
+    renameBucket,
     deleteTransaction,
     updateTransaction,
     convertChipPolarity,

@@ -61,6 +61,17 @@ export const useBudgetActions = ({ state, dispatch }: UseBudgetActionsProps) => 
     dispatch({ type: 'RESET_BUCKET', payload: { bucketId } });
   };
 
+  const deleteBucket = (bucketId: string) => {
+    dispatch({ type: 'DELETE_BUCKET', payload: { bucketId } });
+    if (state.soundEnabled) {
+      soundManager.playDelete();
+    }
+  };
+
+  const renameBucket = (bucketId: string, name: string) => {
+    dispatch({ type: 'RENAME_BUCKET', payload: { bucketId, name } });
+  };
+
   const deleteTransaction = (transactionId: string) => {
     dispatch({ type: 'DELETE_TRANSACTION', payload: { transactionId } });
     if (state.soundEnabled) {
@@ -132,6 +143,8 @@ export const useBudgetActions = ({ state, dispatch }: UseBudgetActionsProps) => 
     removeChip,
     clearChips,
     resetBucket,
+    deleteBucket,
+    renameBucket,
     deleteTransaction,
     updateTransaction,
     convertChipPolarity,
