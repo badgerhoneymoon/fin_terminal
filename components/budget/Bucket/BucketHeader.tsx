@@ -159,7 +159,7 @@ export function BucketHeader({
                     value={editedTarget}
                     onChange={(e) => setEditedTarget(Number(e.target.value))}
                     onKeyDown={handleKeyDown}
-                    className="bg-black/60 text-white px-2 py-1 border border-[var(--text-primary)] rounded text-sm w-32"
+                    className="bg-black/60 text-white px-2 py-1 border border-[var(--text-primary)] rounded text-sm w-20 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                     autoFocus
                   />
                   <button
@@ -201,7 +201,7 @@ export function BucketHeader({
                     value={editedTarget}
                     onChange={(e) => setEditedTarget(Number(e.target.value))}
                     onKeyDown={handleKeyDown}
-                    className="bg-black/60 text-white px-2 py-1 border border-[var(--text-primary)] rounded text-sm w-32"
+                    className="bg-black/60 text-white px-2 py-1 border border-[var(--text-primary)] rounded text-sm w-20 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                     autoFocus
                   />
                   <button
