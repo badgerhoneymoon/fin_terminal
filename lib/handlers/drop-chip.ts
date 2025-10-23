@@ -131,11 +131,17 @@ export function handleDropChip(
     }
   }
 
+  // For fund buckets, transaction amount should be in the chip's original currency
+  // since that's what gets stored in holdings. For debt buckets, use the converted amount.
+  const transactionAmount = bucket.type === 'fund' && !chip.isNegative
+    ? chip.amount  // Store original chip amount for fund deposits
+    : actualAmount; // Use converted amount for debt buckets and fund withdrawals
+
   const newTransaction: Transaction = {
     id: `txn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     chipId,
     bucketId,
-    amount: actualAmount,
+    amount: transactionAmount,
     timestamp: new Date(),
     type: transactionType,
     originalChipAmount: chip.amount,
