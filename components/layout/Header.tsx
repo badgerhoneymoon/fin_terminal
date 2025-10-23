@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBudget } from '@/lib/context/budget-context';
 import { useState, useEffect } from 'react';
 import { AddBucketModal } from '@/components/budget/AddBucketModal';
+import { CurrencyConverterModal } from '@/components/budget/CurrencyConverterModal';
 
 interface HeaderProps {
   layoutMode?: 'individual' | 'compact';
@@ -151,6 +152,9 @@ export function Header({ layoutMode = 'compact', onLayoutModeChange }: HeaderPro
       <div className="flex items-center gap-3">
         {/* Add Bucket Button */}
         <AddBucketModal />
+
+        {/* Currency Converter */}
+        <CurrencyConverterModal />
 
         {/* Layout Toggle */}
         {onLayoutModeChange && (
