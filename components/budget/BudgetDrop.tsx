@@ -10,12 +10,14 @@ import { Bucket } from './Bucket/Bucket';
 import { CompactGoals } from './CompactGoals';
 import { StagingTray } from '../trays/StagingTray';
 import { Chip } from '../inputs/Chip';
+import { ChecklistSidebar } from './ChecklistSidebar';
 import { Chip as ChipType, Bucket as BucketType } from '@/lib/types';
 
 export function BudgetDrop() {
   const { state, dropChip } = useBudget();
   const [activeChip, setActiveChip] = useState<ChipType | null>(null);
   const [layoutMode, setLayoutMode] = useState<'individual' | 'compact'>('individual');
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
 
 
 
@@ -54,7 +56,7 @@ export function BudgetDrop() {
         <div className="flex flex-col min-h-screen">
           {/* Header */}
           <div className="sticky top-0 z-40 bg-[var(--bg-terminal)]">
-            <Header 
+            <Header
               layoutMode={layoutMode}
               onLayoutModeChange={setLayoutMode}
             />
@@ -121,6 +123,12 @@ export function BudgetDrop() {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Checklist Sidebar */}
+      <ChecklistSidebar
+        isOpen={isChecklistOpen}
+        onToggle={() => setIsChecklistOpen(!isChecklistOpen)}
+      />
     </div>
   );
 } 
