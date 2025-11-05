@@ -2,6 +2,7 @@ import { BudgetState, BudgetAction, Chip, DEFAULT_BUCKETS } from '../types';
 import { handleDropChip } from '../handlers/drop-chip';
 import { handleUpdateTransaction } from '../handlers/update-transaction';
 import { handleDeleteTransaction } from '../handlers/delete-transaction';
+import { generateId } from '../utils';
 
 
 /**
@@ -33,7 +34,7 @@ export function budgetReducer(state: BudgetState, action: BudgetAction): BudgetS
       const usdRate = state.exchangeRates.rates[currency] || 1;
 
       const newChip: Chip = {
-        id: `chip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: generateId('chip'),
         amount,
         currency,
         usdRate,

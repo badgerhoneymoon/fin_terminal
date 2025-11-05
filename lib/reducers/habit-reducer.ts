@@ -1,13 +1,5 @@
 import { HabitState, HabitAction, Habit } from '../types';
-
-// Helper function to get Monday of current week
-function getMondayOfWeek(date: Date = new Date()): Date {
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
-  const monday = new Date(date.setDate(diff));
-  monday.setHours(0, 0, 0, 0);
-  return monday;
-}
+import { generateId, getMondayOfWeek } from '../utils';
 
 export const initialHabitState: HabitState = {
   habits: [],
@@ -21,7 +13,7 @@ export function habitReducer(state: HabitState, action: HabitAction): HabitState
       const { name, description, target = 6 } = action.payload;
       
       const newHabit: Habit = {
-        id: `habit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: generateId('habit'),
         name,
         description,
         weekStart: state.currentWeekStart,

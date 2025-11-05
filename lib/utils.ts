@@ -43,15 +43,29 @@ export function formatSmartAmount(amount: number, currency?: string): string {
   }
 }
 
+// Generate a unique ID with a given prefix
+export function generateId(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// Helper function to get Monday of current week
+export function getMondayOfWeek(date: Date = new Date()): Date {
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+  const monday = new Date(date.setDate(diff));
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
 // Calculate the total USD value from a bucket's holdings
 export function calculateCurrentFromHoldings(
   holdings: { [currency: string]: number } | undefined,
   exchangeRates: { [key: string]: number }
 ): number {
   if (!holdings) return 0;
-  
+
   let totalUSD = 0;
-  
+
   Object.entries(holdings).forEach(([currency, amount]) => {
     if (currency === 'USD') {
       totalUSD += amount;
@@ -62,6 +76,6 @@ export function calculateCurrentFromHoldings(
       }
     }
   });
-  
+
   return totalUSD;
 }

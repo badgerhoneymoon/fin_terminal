@@ -1,15 +1,7 @@
 import { HabitState } from '../types';
+import { getMondayOfWeek } from '../utils';
 
 const STORAGE_KEY = 'habitterminal.v1';
-
-// Helper function to get Monday of current week
-function getMondayOfWeek(date: Date = new Date()): Date {
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
-  const monday = new Date(date.setDate(diff));
-  monday.setHours(0, 0, 0, 0);
-  return monday;
-}
 
 // Helper function to migrate old habit state to new structure
 const migrateHabitState = (state: HabitState): HabitState => {

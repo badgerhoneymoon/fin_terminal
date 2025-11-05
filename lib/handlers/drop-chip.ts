@@ -1,4 +1,22 @@
 import { BudgetState, Bucket, Chip, Transaction } from '../types';
+import { generateId } from '../utils';
+
+// Helper function to create a remainder chip
+function createRemainderChip(
+  chip: Chip,
+  remainderAmount: number,
+  isNegative: boolean
+): Chip {
+  return {
+    id: generateId('chip'),
+    amount: remainderAmount,
+    currency: chip.currency,
+    usdRate: chip.usdRate,
+    createdAt: new Date(),
+    isNegative,
+    note: chip.note
+  };
+}
 
 export function handleDropChip(
   state: BudgetState,
@@ -37,15 +55,7 @@ export function handleDropChip(
         const remainderInOriginalCurrency = remainderInUSD / chip.usdRate;
         
         if (remainderInOriginalCurrency > 0) {
-          remainderChip = {
-            id: `chip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            amount: remainderInOriginalCurrency,
-            currency: chip.currency,
-            usdRate: chip.usdRate,
-            createdAt: new Date(),
-            isNegative: true,
-            note: chip.note
-          };
+          remainderChip = createRemainderChip(chip, remainderInOriginalCurrency, true);
         }
       }
     } else {
@@ -61,15 +71,7 @@ export function handleDropChip(
         const remainderInUSD = (convertedAmount - actualAmount) * bucketRate;
         const remainderInOriginalCurrency = remainderInUSD / chip.usdRate;
 
-        remainderChip = {
-          id: `chip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          amount: remainderInOriginalCurrency,
-          currency: chip.currency,
-          usdRate: chip.usdRate,
-          createdAt: new Date(),
-          isNegative: false,
-          note: chip.note
-        };
+        remainderChip = createRemainderChip(chip, remainderInOriginalCurrency, false);
       } else {
         newCurrent = bucket.current - actualAmount;
       }
@@ -90,15 +92,7 @@ export function handleDropChip(
         const remainderInOriginalCurrency = remainderInUSD / chip.usdRate;
 
         if (remainderInOriginalCurrency > 0) {
-          remainderChip = {
-            id: `chip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            amount: remainderInOriginalCurrency,
-            currency: chip.currency,
-            usdRate: chip.usdRate,
-            createdAt: new Date(),
-            isNegative: true,
-            note: chip.note
-          };
+          remainderChip = createRemainderChip(chip, remainderInOriginalCurrency, true);
         }
       } else {
         newCurrent = bucket.current - actualAmount;
@@ -116,15 +110,7 @@ export function handleDropChip(
         const remainderInUSD = (convertedAmount - actualAmount) * bucketRate;
         const remainderInOriginalCurrency = remainderInUSD / chip.usdRate;
 
-        remainderChip = {
-          id: `chip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          amount: remainderInOriginalCurrency,
-          currency: chip.currency,
-          usdRate: chip.usdRate,
-          createdAt: new Date(),
-          isNegative: false,
-          note: chip.note
-        };
+        remainderChip = createRemainderChip(chip, remainderInOriginalCurrency, false);
       } else {
         newCurrent = bucket.current + actualAmount;
       }
@@ -138,7 +124,7 @@ export function handleDropChip(
     : actualAmount; // Use converted amount for debt buckets and fund withdrawals
 
   const newTransaction: Transaction = {
-    id: `txn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: generateId('txn'),
     chipId,
     bucketId,
     amount: transactionAmount,
