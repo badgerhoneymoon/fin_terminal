@@ -19,6 +19,7 @@ export function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState<Currency>('VND');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [description, setDescription] = useState('');
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -26,12 +27,23 @@ export function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   };
 
   const handleNumberPress = (num: string) => {
-    if (num === '.' && amount.includes('.')) return;
-    if (amount === '0' && num !== '.') {
+    // Allow multiple decimals if separated by +
+    if (num === '.') {
+      const parts = amount.split('+');
+      const lastPart = parts[parts.length - 1];
+      if (lastPart.includes('.')) return;
+    }
+    if (amount === '0' && num !== '.' && num !== '+') {
       setAmount(num);
     } else {
       setAmount(prev => prev + num);
     }
+  };
+
+  const handlePlusPress = () => {
+    // Don't allow + at start or after another +
+    if (!amount || amount.endsWith('+')) return;
+    setAmount(prev => prev + '+');
   };
 
   const handleBackspace = () => {
@@ -44,11 +56,25 @@ export function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     setCurrency(EXPENSE_CURRENCIES[nextIndex]);
   };
 
-  const handleSubmit = () => {
-    if (!selectedCategory || !amount || parseFloat(amount) <= 0) return;
+  // Calculate sum if expression contains +
+  const calculateTotal = (expr: string): number => {
+    if (!expr) return 0;
+    // Remove trailing + if present
+    const cleanExpr = expr.endsWith('+') ? expr.slice(0, -1) : expr;
+    return cleanExpr.split('+').reduce((sum, part) => sum + (parseFloat(part) || 0), 0);
+  };
 
-    addExpense(selectedCategory, parseFloat(amount), currency, undefined, selectedDate);
-    handleClose();
+  const handleSubmit = () => {
+    const total = calculateTotal(amount);
+    if (!selectedCategory || !amount || total <= 0) return;
+
+    addExpense(selectedCategory, total, currency, description || undefined, selectedDate);
+    // Reset for next expense but stay open
+    setStep('category');
+    setSelectedCategory(null);
+    setAmount('');
+    setDescription('');
+    // Keep currency and date - likely same for batch entry
   };
 
   const handleClose = () => {
@@ -57,6 +83,7 @@ export function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     setAmount('');
     setCurrency('VND');
     setSelectedDate(new Date());
+    setDescription('');
     onClose();
   };
 
@@ -93,6 +120,15 @@ export function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
   // Format amount with comma separators for display (no spaces)
   const formatDisplayAmount = (value: string) => {
+    if (!value) return '0';
+    // Handle expressions with +
+    if (value.includes('+')) {
+      return value.split('+').map(part => formatSingleNumber(part)).join('+');
+    }
+    return formatSingleNumber(value);
+  };
+
+  const formatSingleNumber = (value: string) => {
     if (!value) return '0';
     const parts = value.split('.');
     const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -157,11 +193,19 @@ export function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                 /* Amount Entry with Numpad */
                 <div className="space-y-4">
                   {/* Amount Display */}
-                  <div className="text-center py-4 border border-[var(--text-primary)]">
-                    <div className="text-3xl font-mono font-bold text-[var(--text-primary)]">
+                  <div className="text-center py-4 px-2 border border-[var(--text-primary)] overflow-hidden">
+                    <div
+                      className="font-mono font-bold text-[var(--text-primary)] break-all"
+                      style={{ fontSize: amount.length > 20 ? '1.25rem' : amount.length > 12 ? '1.5rem' : '1.875rem' }}
+                    >
                       {CURRENCIES[currency].symbol}
                       {formatDisplayAmount(amount)}
                     </div>
+                    {amount.includes('+') && (
+                      <div className="text-sm font-mono text-[var(--text-primary)] opacity-60 mt-1">
+                        = {CURRENCIES[currency].symbol}{formatDisplayAmount(calculateTotal(amount).toString())}
+                      </div>
+                    )}
                   </div>
 
                   {/* Date and Currency Row */}
@@ -199,21 +243,41 @@ export function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     </button>
                   </div>
 
+                  {/* Description Input */}
+                  <input
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="DESCRIPTION (OPTIONAL)"
+                    className="w-full p-3 border border-[var(--text-primary)] bg-transparent
+                              text-[var(--text-primary)] font-mono text-sm
+                              placeholder:text-[var(--text-primary)]/40
+                              focus:outline-none focus:bg-[var(--text-primary)]/5"
+                  />
+
                   {/* Numpad */}
-                  <div className="grid grid-cols-3 gap-2">
-                    {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'].map(key => (
-                      <motion.button
-                        key={key}
-                        onClick={() => key === '⌫' ? handleBackspace() : handleNumberPress(key)}
-                        className={`p-4 border border-[var(--text-primary)] text-[var(--text-primary)]
-                                  font-mono hover:bg-[var(--text-primary)]/10
-                                  active:bg-[var(--text-primary)] active:text-[var(--bg-terminal)]
-                                  transition-colors duration-100
-                                  ${key === '⌫' ? 'text-3xl' : 'text-xl'}`}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        {key}
-                      </motion.button>
+                  <div className="grid grid-cols-4 gap-2">
+                    {['1', '2', '3', '+', '4', '5', '6', '.', '7', '8', '9', '⌫', null, '0', null, null].map((key, idx) => (
+                      key ? (
+                        <motion.button
+                          key={key}
+                          onClick={() => {
+                            if (key === '⌫') handleBackspace();
+                            else if (key === '+') handlePlusPress();
+                            else handleNumberPress(key);
+                          }}
+                          className={`p-4 border border-[var(--text-primary)] text-[var(--text-primary)]
+                                    font-mono hover:bg-[var(--text-primary)]/10
+                                    active:bg-[var(--text-primary)] active:text-[var(--bg-terminal)]
+                                    transition-colors duration-100
+                                    ${key === '⌫' ? 'text-3xl' : 'text-xl'}`}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {key}
+                        </motion.button>
+                      ) : (
+                        <div key={`empty-${idx}`} />
+                      )
                     ))}
                   </div>
 

@@ -148,9 +148,10 @@ export const DEFAULT_EXPENSE_CATEGORIES: ExpenseCategory[] = [
   { id: 'housing', name: 'HOUSING', monthlyLimit: 840, type: 'fixed' },
   { id: 'food', name: 'FOOD', monthlyLimit: 690, type: 'variable' },
   { id: 'transport', name: 'TRANSPORT', monthlyLimit: 120, type: 'fixed' },
-  { id: 'fitness', name: 'FITNESS', monthlyLimit: 288, type: 'fixed' },
+  { id: 'fitness', name: 'FITNESS', monthlyLimit: 378, type: 'fixed' },
   { id: 'lessons', name: 'LESSONS', monthlyLimit: 258, type: 'fixed' },
   { id: 'subscriptions', name: 'SUBSCRIPTIONS', monthlyLimit: 100, type: 'fixed' },
+  { id: 'misc', name: 'MISC', monthlyLimit: 114, type: 'variable' },
 ];
 
 export const EXPENSE_CURRENCIES: Currency[] = ['VND', 'USD', 'RUB'];

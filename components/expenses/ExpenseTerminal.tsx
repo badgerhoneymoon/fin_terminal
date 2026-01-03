@@ -14,8 +14,9 @@ export function ExpenseTerminal() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   const totalSpent = getTotalMonthSpent();
-  const totalColor = getProgressColor(totalSpent, state.totalBudget);
-  const totalPercentage = Math.min((totalSpent / state.totalBudget) * 100, 100);
+  const totalLimit = state.categories.reduce((sum, cat) => sum + cat.monthlyLimit, 0);
+  const totalColor = getProgressColor(totalSpent, totalLimit);
+  const totalPercentage = Math.min((totalSpent / totalLimit) * 100, 100);
 
   // Month navigation
   const navigateMonth = (direction: 'prev' | 'next') => {
@@ -119,7 +120,7 @@ export function ExpenseTerminal() {
                     TOTAL
                   </span>
                   <span className="text-lg font-mono font-bold text-[var(--text-primary)]">
-                    ${formatSmartAmount(totalSpent)} / ${formatSmartAmount(state.totalBudget)}
+                    ${formatSmartAmount(totalSpent)} / ${formatSmartAmount(totalLimit)}
                   </span>
                 </div>
                 <div className="h-3 bg-[var(--text-primary)]/20 border border-[var(--text-primary)]">
