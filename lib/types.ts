@@ -111,6 +111,50 @@ export type HabitAction =
 
 export const DAYS_OF_WEEK = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as const;
 
+// Expense Tracker Types
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  monthlyLimit: number; // In USD
+  type: 'fixed' | 'variable'; // variable = daily extrapolation
+}
+
+export interface Expense {
+  id: string;
+  categoryId: string;
+  amount: number;
+  currency: Currency;
+  usdRate: number; // Rate at time of entry
+  description?: string;
+  date: Date;
+  createdAt: Date;
+}
+
+export interface ExpenseState {
+  categories: ExpenseCategory[];
+  expenses: Expense[];
+  totalBudget: number; // $2,500
+  currentMonth: Date; // First day of month being viewed
+}
+
+export type ExpenseAction =
+  | { type: 'ADD_EXPENSE'; payload: { categoryId: string; amount: number; currency: Currency; usdRate: number; description?: string; date?: Date } }
+  | { type: 'DELETE_EXPENSE'; payload: { expenseId: string } }
+  | { type: 'SET_MONTH'; payload: { month: Date } }
+  | { type: 'IMPORT_DATA'; payload: ExpenseState }
+  | { type: 'RESET_STATE' };
+
+export const DEFAULT_EXPENSE_CATEGORIES: ExpenseCategory[] = [
+  { id: 'housing', name: 'HOUSING', monthlyLimit: 840, type: 'fixed' },
+  { id: 'food', name: 'FOOD', monthlyLimit: 690, type: 'variable' },
+  { id: 'transport', name: 'TRANSPORT', monthlyLimit: 120, type: 'fixed' },
+  { id: 'fitness', name: 'FITNESS', monthlyLimit: 288, type: 'fixed' },
+  { id: 'lessons', name: 'LESSONS', monthlyLimit: 258, type: 'fixed' },
+  { id: 'subscriptions', name: 'SUBSCRIPTIONS', monthlyLimit: 100, type: 'fixed' },
+];
+
+export const EXPENSE_CURRENCIES: Currency[] = ['VND', 'USD', 'RUB'];
+
 export const DEFAULT_BUCKETS: Bucket[] = [
   {
     id: 'stabilisation-fund',

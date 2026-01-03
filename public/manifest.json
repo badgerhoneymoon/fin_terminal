@@ -1,0 +1,18 @@
+{
+  "name": "Budget Drop - Expense Tracker",
+  "short_name": "Expenses",
+  "description": "Track your monthly expenses with a retro CRT terminal interface",
+  "start_url": "/expenses",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00FF90",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
