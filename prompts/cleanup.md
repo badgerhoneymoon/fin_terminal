@@ -1,12 +1,7 @@
----
-description: 
-globs: 
-alwaysApply: false
----
 # Code Cleanup Request
 
 ## Context
-Please analyze the files we were working on during our conversation and identify any redundant or unused code that needs to be cleaned up.
+Your goal is to analyze the files we were working on during our conversation and identify any redundant or unused code that needs to be cleaned up.
 
 ## Required Actions
 1. Review the files we modified:
