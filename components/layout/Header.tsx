@@ -274,6 +274,17 @@ export function Header({ layoutMode = 'compact', onLayoutModeChange }: HeaderPro
                         🎯 Habit Terminal
                       </a>
                     </div>
+
+                    {/* Expense Tracker Link */}
+                    <div className="px-3 py-2">
+                      <a
+                        href="/expenses"
+                        onClick={() => setShowSettingsDropdown(false)}
+                        className="w-full text-left text-xs hover:bg-[var(--text-primary)]/20 hover:text-[var(--text-primary)] transition-colors py-1 text-[var(--text-primary)] opacity-70 hover:opacity-100 block"
+                      >
+                        💸 Expense Tracker
+                      </a>
+                    </div>
                     
                     {/* Reset Button */}
                     <div className="px-3 py-2">
